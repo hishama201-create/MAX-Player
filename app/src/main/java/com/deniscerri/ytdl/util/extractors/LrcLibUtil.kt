@@ -36,7 +36,7 @@ object LrcLibUtil {
             .joinToString("&")
         val conn = URL("$API/$path" + if (query.isNotEmpty()) "?$query" else "").openConnection() as HttpURLConnection
         return try {
-            conn.setRequestProperty("User-Agent", "YTDLnis (https://github.com/deniscerri/ytdlnis)")
+            conn.setRequestProperty("User-Agent", "MAX-Player (https://github.com/hishama201-create/MAX-Player)")
             conn.connectTimeout = 8000
             conn.readTimeout = 10000
             if (conn.responseCode == 404) null
