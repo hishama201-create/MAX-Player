@@ -154,7 +154,7 @@ object ThemeUtil {
     fun getStyledAppName(context: Context): Spanned {
         val colorPrimary = getThemeColor(context, androidx.appcompat.R.attr.colorPrimaryDark)
         val hexColor = "#%06X".format(0xFFFFFF and colorPrimary)
-        return "<span  style='color:$hexColor';>YTDL</span>nis"
+        return "<span  style='color:$hexColor';>MAX</span>-Player"
             .parseAsHtml(HtmlCompat.FROM_HTML_MODE_COMPACT)
     }
 

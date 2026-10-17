@@ -1,4 +1,9 @@
-# MAX-Player
+<p align="center">
+  <img src="docs/logo.png" width="140" alt="MAX-Player">
+</p>
+
+<h1 align="center">MAX-Player</h1>
+
 
 تطبيق أندرويد مفتوح المصدر لتحميل الفيديو والصوت من مواقع كثيرة، يعتمد على yt-dlp.
 

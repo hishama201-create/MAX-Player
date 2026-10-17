@@ -84,7 +84,7 @@ class MoreFragment : Fragment() {
             showingDownloadQueue = any { n -> n.itemId == R.id.downloadQueueMainFragment && n.isVisible }
         }
 
-        terminal.isVisible = !showingTerminal
+        terminal.isVisible = false
         downloads.isVisible = !showingDownloads
         downloadQueue.isVisible = !showingDownloadQueue
 
