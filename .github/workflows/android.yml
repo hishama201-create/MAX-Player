@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - "**"
+    tags:
+      - "v*"
 
 jobs:
   translators:
@@ -72,3 +74,22 @@ jobs:
         with:
           name: MAX-Player-universal-release
           path: ${{ env.main_project_module }}/build/outputs/apk/github/release/*universal*.apk
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: MAX-Player-universal-release
+          path: dist
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.apk
+          generate_release_notes: true
