@@ -63,7 +63,7 @@ class LogViewModel(private val application: Application) : AndroidViewModel(appl
             val log = repository.getLogByID(id)
             val dir = File("${FileUtil.getCachePath(application)}/Logs/")
             dir.mkdirs()
-            val tmp = File("${dir.absolutePath}/[YTDLnis Log] ${log!!.title}.txt")
+            val tmp = File("${dir.absolutePath}/[MAX-Player Log] ${log!!.title}.txt")
             tmp.delete()
             tmp.createNewFile()
             tmp.writeText(log.content)
