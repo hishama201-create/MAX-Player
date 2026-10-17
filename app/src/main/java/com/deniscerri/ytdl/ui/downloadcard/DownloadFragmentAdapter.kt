@@ -43,7 +43,7 @@ class DownloadFragmentAdapter (
     )
 
     override fun getItemCount(): Int {
-        return fragments.size
+        return fragments.size - 1
     }
 
 

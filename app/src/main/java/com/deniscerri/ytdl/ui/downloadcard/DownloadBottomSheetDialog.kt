@@ -143,6 +143,7 @@ class DownloadBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         tabLayout = view.findViewById(R.id.download_tablayout)
+        (tabLayout.getChildAt(0) as? ViewGroup)?.getChildAt(2)?.visibility = android.view.View.GONE
         viewPager2 = view.findViewById(R.id.download_viewpager)
         updateItem = view.findViewById(R.id.update_item)
         viewPager2.isUserInputEnabled = sharedPreferences.getBoolean("swipe_gestures_download_card", true)
@@ -219,9 +220,9 @@ class DownloadBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                 }
                 else -> {
-                    tabLayout.getTabAt(2)!!.select()
+                    tabLayout.getTabAt(0)!!.select()
                     viewPager2.postDelayed( {
-                        viewPager2.setCurrentItem(2, false)
+                        viewPager2.setCurrentItem(0, false)
                     }, 200)
                 }
             }

@@ -75,6 +75,7 @@ class ConfigureDownloadBottomSheetDialog(private val currentDownloadItem: Downlo
         }
 
         tabLayout = view.findViewById(R.id.download_tablayout)
+        (tabLayout.getChildAt(0) as? ViewGroup)?.getChildAt(2)?.visibility = android.view.View.GONE
         viewPager2 = view.findViewById(R.id.download_viewpager)
         viewPager2.isUserInputEnabled = sharedPreferences.getBoolean("swipe_gestures_download_card", true)
 
@@ -133,9 +134,9 @@ class ConfigureDownloadBottomSheetDialog(private val currentDownloadItem: Downlo
                     }
                 }
                 else -> {
-                    tabLayout.selectTab(tabLayout.getTabAt(2))
+                    tabLayout.selectTab(tabLayout.getTabAt(0))
                     viewPager2.postDelayed( {
-                        viewPager2.setCurrentItem(2, false)
+                        viewPager2.setCurrentItem(0, false)
                     }, 200)
                 }
             }

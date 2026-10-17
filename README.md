@@ -15,7 +15,14 @@
 - يعمل على أندرويد 7 فما فوق
 
 ## التحميل
-من تبويب **Actions** ثم آخر بناء ناجح، وحمّل **MAX-Player-universal-release** (نسخة واحدة تعمل على كل الهواتف).
+من صفحة [Releases](https://github.com/hishama201-create/MAX-Player/releases) حمّل أحدث إصدار، وفيه ملفان:
+
+| الملف | يناسب | الحجم التقريبي |
+|---|---|---|
+| **universal** (الشاملة) | أي هاتف أندرويد 7 فما فوق | 205 MB |
+| **arm64** | الهواتف الحديثة (معظم الهواتف بعد 2017) | 63 MB |
+
+إن لم تكن متأكداً فاختر **universal**.
 
 ## الشكر والترخيص
 هذا المشروع مبني على [YTDLnis](https://github.com/deniscerri/ytdlnis) من تطوير Denis Çerri، وهو بترخيص [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html).

@@ -595,8 +595,8 @@
     </plurals>
     <string name="unskip_ignored_desc">Scarica gli upload esistenti che la prima esecuzione ha saltato</string>
     <string name="observe_runs_chip">%d esecuzioni</string>
-    <string name="bgutils_info">Un token di prova-di-origine (proof-of origin, POT) del fornitore di yt-dlp.\nCon questo abilitato, YTDlnis ospita il server HTTP che genera il POT e jnstalla i plugin rilevanti che yt-dlp usa.</string>
-    <string name="packages_description">I pacchetti sono applicazioni d\'aiuto che YTDlnis usa per aiutare con i comandi yt-dlp. Alcuni di quelli sono per installati, ma puoi installare nuove versioni che sono pubblicate senza bisogno di aggiornare l\'app. L\'apk installato rimpiazza la versione preinstallata che l\'app usa.</string>
+    <string name="bgutils_info">Un token di prova-di-origine (proof-of origin, POT) del fornitore di yt-dlp.\nCon questo abilitato, MAX-Player ospita il server HTTP che genera il POT e jnstalla i plugin rilevanti che yt-dlp usa.</string>
+    <string name="packages_description">I pacchetti sono applicazioni d\'aiuto che MAX-Player usa per aiutare con i comandi yt-dlp. Alcuni di quelli sono per installati, ma puoi installare nuove versioni che sono pubblicate senza bisogno di aggiornare l\'app. L\'apk installato rimpiazza la versione preinstallata che l\'app usa.</string>
     <string name="bgutils_pot_generation_script_summary">Ogni chiamata yt-dlp comporta il sovraccarico dovuto alla creazione di un nuovo processo runtime js per eseguire la script. Questo metodo non è raccomandato per usagio ad alta concorrenza.</string>
     <string name="bgutils_pot_generation_script_info">Per usare il POT Procider BgUtils, l\'apl deve essere scaricata dal repo da github Brainicism/bgutil-ytdlp-pot-provider e iniziare l\'installazione. Questo ci potrebbe mettere un po\' per finire. Procedere ora?</string>
     <string name="burn_subs">Masterizza sottotitoli</string>
@@ -652,7 +652,7 @@
     <string name="merge_cuts">Unisci i tagli in un file</string>
     <string name="write_ytdlp_terminal">Scrivi automaticamente yt-dlp nel terminale</string>
     <string name="clear">Cancella</string>
-    <string name="welcome_title">Benvenuto su YTDLnis</string>
+    <string name="welcome_title">Benvenuto su MAX-Player</string>
     <string name="welcome_subtitle">Scarica video e audio utilizzando yt-dlp. Prima configuriamo alcune cose.</string>
     <string name="welcome_get_started">Inizia</string>
     <string name="welcome_restore_backup">Ripristina da backup</string>

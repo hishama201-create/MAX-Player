@@ -75,6 +75,12 @@ jobs:
           name: MAX-Player-universal-release
           path: ${{ env.main_project_module }}/build/outputs/apk/github/release/*universal*.apk
 
+      - name: Upload arm64 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MAX-Player-arm64-release
+          path: ${{ env.main_project_module }}/build/outputs/apk/github/release/*arm64*.apk
+
   release:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
@@ -85,7 +91,8 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: MAX-Player-universal-release
+          pattern: MAX-Player-*-release
+          merge-multiple: true
           path: dist
 
       - name: Publish release

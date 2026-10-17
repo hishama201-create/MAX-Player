@@ -8,7 +8,7 @@ import urllib.request
 from yt_dlp.postprocessor.common import PostProcessor
 
 API = 'https://lrclib.net/api'
-USER_AGENT = 'YTDLnis (https://github.com/deniscerri/ytdlnis)'
+USER_AGENT = 'MAX-Player (https://github.com/hishama201-create/MAX-Player)'
 DURATION_TOLERANCE = 5
 
 _LRC_STAMP = re.compile(r'\[(\d+):(\d+(?:\.\d+)?)\]')

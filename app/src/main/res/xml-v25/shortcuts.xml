@@ -7,7 +7,7 @@
         android:shortcutDisabledMessage="@string/search">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.deniscerri.ytdl"
+            android:targetPackage="com.maxplayer.app"
             android:targetClass="com.deniscerri.ytdl.MainActivity">
 
             <extra android:name="destination" android:value="Search" />
@@ -24,7 +24,7 @@
         android:shortcutDisabledMessage="@string/downloads">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.deniscerri.ytdl"
+            android:targetPackage="com.maxplayer.app"
             android:targetClass="com.deniscerri.ytdl.MainActivity">
 
             <extra android:name="destination" android:value="Downloads" />
@@ -40,24 +40,10 @@
         android:shortcutDisabledMessage="@string/download_queue">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.deniscerri.ytdl"
+            android:targetPackage="com.maxplayer.app"
             android:targetClass="com.deniscerri.ytdl.MainActivity">
 
             <extra android:name="destination" android:value="Queue" />
-
-        </intent>
-    </shortcut>
-
-    <shortcut
-        android:shortcutId="terminal"
-        android:enabled="true"
-        android:icon="@drawable/ic_terminal_red"
-        android:shortcutShortLabel="@string/terminal"
-        android:shortcutDisabledMessage="@string/terminal">
-        <intent
-            android:action="android.intent.category.DEFAULT"
-            android:targetPackage="com.deniscerri.ytdl"
-            android:targetClass="com.deniscerri.ytdl.ui.more.terminal.TerminalActivity">
 
         </intent>
     </shortcut>
