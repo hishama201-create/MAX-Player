@@ -59,6 +59,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/about" >
+        <Preference app:key="developer" app:icon="@drawable/ic_code" app:title="المطوّر" app:summary="hisham" />
         <Preference
             app:icon="@drawable/baseline_exit_to_app_24"
             app:key="package_name"
