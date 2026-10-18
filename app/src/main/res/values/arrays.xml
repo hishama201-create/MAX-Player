@@ -233,14 +233,12 @@
         <item>@string/auto</item>
         <item>@string/audio</item>
         <item>@string/video</item>
-        <item>@string/command</item>
     </string-array>
 
     <string-array name="download_types_values">
         <item>auto</item>
         <item>audio</item>
         <item>video</item>
-        <item>command</item>
     </string-array>
 
     <array name="initial_slider_values">
