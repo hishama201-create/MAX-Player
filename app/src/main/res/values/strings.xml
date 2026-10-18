@@ -649,9 +649,9 @@
     <string name="welcome_restore_backup">Restore from backup</string>
     <string name="welcome_restore_failed">Could not restore this backup</string>
     <string name="welcome_restoring">Restoring backup…</string>
-    <string name="welcome_guide_title">Read the guide</string>
-    <string name="welcome_guide_summary">The guide covers everything about the app, downloading, command templates and fixing common problems. You can open it any time from the website.</string>
-    <string name="welcome_open_guide">Open guide</string>
+    <string name="welcome_guide_title">Join our Telegram channel</string>
+    <string name="welcome_guide_summary">Follow the channel for news, updates and new versions of MAX-Player.</string>
+    <string name="welcome_open_guide">Join channel</string>
     <string name="welcome_permissions_title">Permissions</string>
     <string name="welcome_permissions_summary">MAX-Player works best with these. You can change them later in the settings.</string>
     <string name="welcome_perm_storage">Storage access</string>

@@ -18,6 +18,7 @@
         android:defaultValue=""
         app:icon="@drawable/ic_terminal"
         app:key="command_path"
+        app:isPreferenceVisible="false"
         app:title="@string/command_directory" />
 
     <Preference
