@@ -13,10 +13,6 @@
         android:icon="@drawable/ic_baseline_file_open_24"
         android:checkable="true"
         android:id="@+id/downloadLogListFragment"/>
-    <item android:title="@string/command_templates"
-        android:icon="@drawable/ic_baseline_keyboard_arrow_right_24"
-        android:checkable="true"
-        android:id="@+id/commandTemplatesFragment"/>
     <item android:title="@string/download_queue"
         android:icon="@drawable/baseline_downloading_24"
         android:checkable="true"
