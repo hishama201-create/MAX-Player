@@ -39,7 +39,7 @@
             android:title="@string/other_youtube_extractor_args" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/command_templates">
+    <PreferenceCategory app:isPreferenceVisible="false" android:title="@string/command_templates">
         <SwitchPreferenceCompat
             android:widgetLayout="@layout/preferece_material_switch"
             android:icon="@drawable/ic_terminal"
