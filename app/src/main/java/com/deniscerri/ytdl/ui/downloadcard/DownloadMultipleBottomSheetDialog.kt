@@ -420,7 +420,7 @@ class DownloadMultipleBottomSheetDialog : BottomSheetDialogFragment(), Configure
                             if(nr == 0){
                                 command!!.visibility = View.GONE
                             }else{
-                                command!!.visibility = View.VISIBLE
+                                command!!.visibility = View.GONE
                             }
                         }
 
@@ -1164,7 +1164,7 @@ class DownloadMultipleBottomSheetDialog : BottomSheetDialogFragment(), Configure
                 if(nr == 0){
                     command!!.visibility = View.GONE
                 }else{
-                    command!!.visibility = View.VISIBLE
+                    command!!.visibility = View.GONE
                 }
             }
 
