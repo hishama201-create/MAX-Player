@@ -141,6 +141,7 @@ class ObserveSourcesBottomSheetDialog : BottomSheetDialogFragment() {
 
         tabLayout = view.findViewById(R.id.download_tablayout)
         viewPager2 = view.findViewById(R.id.download_viewpager)
+        tabLayout.post { (tabLayout.getChildAt(0) as? ViewGroup)?.getChildAt(2)?.visibility = View.GONE }
 
         (viewPager2.getChildAt(0) as? RecyclerView)?.apply {
             isNestedScrollingEnabled = false
@@ -180,9 +181,9 @@ class ObserveSourcesBottomSheetDialog : BottomSheetDialogFragment() {
                 viewPager2.setCurrentItem(1, false)
             }
             else -> {
-                tabLayout.getTabAt(2)!!.select()
+                tabLayout.getTabAt(0)!!.select()
                 viewPager2.postDelayed( {
-                    viewPager2.setCurrentItem(2, false)
+                    viewPager2.setCurrentItem(0, false)
                 }, 200)
             }
         }
