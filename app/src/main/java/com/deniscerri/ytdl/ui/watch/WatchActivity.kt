@@ -1,12 +1,17 @@
 package com.deniscerri.ytdl.ui.watch
 
+import android.app.PictureInPictureParams
 import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.util.Rational
+import android.view.View
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -207,5 +212,47 @@ class WatchActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (::player.isInitialized) player.release()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            ::player.isInitialized && player.isPlaying
+        ) {
+            enterPip()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun enterPip() {
+        try {
+            val params = PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(16, 9))
+                .build()
+            enterPictureInPictureMode(params)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        setPipUi(isInPictureInPictureMode)
+    }
+
+    private fun setPipUi(inPip: Boolean) {
+        val others = listOf(
+            R.id.watch_title,
+            R.id.watch_author,
+            R.id.watch_actions,
+            R.id.watch_chips_scroll,
+            R.id.watch_suggestions
+        )
+        others.forEach { findViewById<View>(it).isVisible = !inPip }
+        findViewById<PlayerView>(R.id.watch_player).useController = !inPip
     }
 }
