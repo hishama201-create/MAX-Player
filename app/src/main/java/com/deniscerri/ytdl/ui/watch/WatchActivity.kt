@@ -1,6 +1,7 @@
 package com.deniscerri.ytdl.ui.watch
 
 import android.app.PictureInPictureParams
+import androidx.activity.OnBackPressedCallback
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.util.Rational
@@ -65,6 +66,8 @@ class WatchActivity : BaseActivity() {
         }
         currentItem = item
 
+        current?.get()?.takeIf { it !== this }?.finish()
+        current = java.lang.ref.WeakReference(this)
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         resultViewModel = ViewModelProvider(this)[ResultViewModel::class.java]
         downloadViewModel = ViewModelProvider(this)[DownloadViewModel::class.java]
@@ -83,6 +86,7 @@ class WatchActivity : BaseActivity() {
         }
 
         setupDownloadButtons()
+        setupBackHandler()
         playItem(item)
         loadSuggestions()
     }
@@ -212,6 +216,7 @@ class WatchActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (::player.isInitialized) player.release()
+        if (current?.get() === this) current = null
     }
 
     override fun onUserLeaveHint() {
@@ -224,14 +229,15 @@ class WatchActivity : BaseActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun enterPip() {
+    private fun enterPip(): Boolean {
         try {
             val params = PictureInPictureParams.Builder()
                 .setAspectRatio(Rational(16, 9))
                 .build()
-            enterPictureInPictureMode(params)
+            return enterPictureInPictureMode(params)
         } catch (e: Exception) {
             e.printStackTrace()
+            return false
         }
     }
 
@@ -254,5 +260,21 @@ class WatchActivity : BaseActivity() {
         )
         others.forEach { findViewById<View>(it).isVisible = !inPip }
         findViewById<PlayerView>(R.id.watch_player).useController = !inPip
+    }
+
+    private fun setupBackHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                    ::player.isInitialized && player.isPlaying && enterPip()
+                ) return
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
+    }
+
+    companion object {
+        private var current: java.lang.ref.WeakReference<WatchActivity>? = null
     }
 }
