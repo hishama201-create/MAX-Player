@@ -39,7 +39,7 @@ class UpdateCheckWorker(
             }
 
             val skipRemindingPackageUpdate = sharedPreferences.getStringSet("skip_reminding_package_update", setOf())!!.toMutableSet()
-            RuntimeManager.packages.forEach { pkg ->
+            RuntimeManager.packages.filter { false }.forEach { pkg ->
                 val instance = pkg.plugin.getInstance()
                 if (instance.bundledVersion.isNullOrBlank() && instance.downloadedVersion.isNullOrBlank()) return@forEach
                 instance.getReleases().apply {
