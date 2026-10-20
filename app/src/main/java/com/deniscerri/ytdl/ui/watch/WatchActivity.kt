@@ -14,18 +14,27 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.ui.PlayerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.deniscerri.ytdl.R
 import com.deniscerri.ytdl.database.models.ResultItem
 import com.deniscerri.ytdl.database.viewmodel.ResultViewModel
 import com.deniscerri.ytdl.ui.BaseActivity
 import com.deniscerri.ytdl.util.VideoPlayerUtil
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WatchActivity : BaseActivity() {
     private lateinit var player: ExoPlayer
     private lateinit var resultViewModel: ResultViewModel
+    private lateinit var suggestionsAdapter: WatchSuggestionsAdapter
+    private lateinit var currentItem: ResultItem
+    private var allResults: List<ResultItem> = emptyList()
+    private var playbackJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +45,21 @@ class WatchActivity : BaseActivity() {
             finish()
             return
         }
+        currentItem = item
 
         resultViewModel = ViewModelProvider(this)[ResultViewModel::class.java]
-
-        findViewById<TextView>(R.id.watch_title).text = item.title
-        findViewById<TextView>(R.id.watch_author).text = item.author
 
         player = VideoPlayerUtil.buildPlayer(this)
         findViewById<PlayerView>(R.id.watch_player).player = player
 
-        startPlayback(item)
+        suggestionsAdapter = WatchSuggestionsAdapter { playItem(it) }
+        findViewById<RecyclerView>(R.id.watch_suggestions).apply {
+            layoutManager = LinearLayoutManager(this@WatchActivity)
+            adapter = suggestionsAdapter
+        }
+
+        playItem(item)
+        loadSuggestions()
     }
 
     @Suppress("DEPRECATION")
@@ -57,10 +71,37 @@ class WatchActivity : BaseActivity() {
         }
     }
 
+    private fun playItem(item: ResultItem) {
+        currentItem = item
+        findViewById<TextView>(R.id.watch_title).text = item.title
+        findViewById<TextView>(R.id.watch_author).text = item.author
+        showSuggestions()
+        startPlayback(item)
+    }
+
+    private fun loadSuggestions() {
+        lifecycleScope.launch {
+            val items = withContext(Dispatchers.IO) {
+                resultViewModel.getAllIds().mapNotNull { resultViewModel.getByID(it) }
+            }
+            allResults = items
+            showSuggestions()
+        }
+    }
+
+    private fun showSuggestions() {
+        suggestionsAdapter.submitList(allResults.filter { it.url != currentItem.url })
+    }
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun startPlayback(item: ResultItem) {
         val loading = findViewById<ProgressBar>(R.id.watch_loading)
-        lifecycleScope.launch {
+        playbackJob?.cancel()
+        player.stop()
+        player.clearMediaItems()
+        loading.isVisible = true
+
+        playbackJob = lifecycleScope.launch {
             try {
                 val urls = withContext(Dispatchers.IO) {
                     if (item.urls.isEmpty()) {
@@ -79,14 +120,16 @@ class WatchActivity : BaseActivity() {
                         factory.createMediaSource(MediaItem.fromUri(Uri.parse(urls[1])))
                     player.setMediaSource(MergingMediaSource(videoSource, audioSource))
                 } else {
-                    player.addMediaItem(MediaItem.fromUri(Uri.parse(urls[0])))
+                    player.setMediaItem(MediaItem.fromUri(Uri.parse(urls[0])))
                 }
                 player.prepare()
                 player.play()
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                loading.isVisible = false
+                if (isActive) loading.isVisible = false
             }
         }
     }
