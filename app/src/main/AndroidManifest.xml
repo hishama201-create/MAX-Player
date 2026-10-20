@@ -619,6 +619,7 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             android:exported="false" />
 
+        <activity android:name=".ui.watch.WatchActivity" android:configChanges="smallestScreenSize|layoutDirection|orientation|screenSize|screenLayout" android:exported="false" />
     </application>
 
 </manifest>

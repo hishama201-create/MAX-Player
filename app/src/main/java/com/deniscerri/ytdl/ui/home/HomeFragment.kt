@@ -909,7 +909,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         if (parentFragmentManager.findFragmentByTag("resultDetails") == null){
             val bundle = Bundle()
             bundle.putParcelable("result", item)
-            findNavController().navigate(R.id.resultCardDetailsDialog, bundle)
+            startActivity(android.content.Intent(requireContext(), com.deniscerri.ytdl.ui.watch.WatchActivity::class.java).putExtra("result", item))
         }
     }
 
