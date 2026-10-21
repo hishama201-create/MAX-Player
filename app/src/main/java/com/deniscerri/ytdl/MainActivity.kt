@@ -83,6 +83,8 @@ import java.io.Reader
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
+import androidx.activity.OnBackPressedCallback
+import com.deniscerri.ytdl.ui.watch.WatchActivity
 
 
 class MainActivity : BaseActivity() {
@@ -111,6 +113,7 @@ class MainActivity : BaseActivity() {
             return
         }
         CrashListener(this).registerExceptionHandler()
+        setupPipBackHandler()
         ThemeUtil.updateTheme(this)
         window.navigationBarColor = SurfaceColors.SURFACE_2.getColor(this)
         setContentView(R.layout.activity_main)
@@ -590,5 +593,19 @@ class MainActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+    }
+
+    private fun setupPipBackHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (WatchActivity.isInPip()) {
+                    moveTaskToBack(true)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
     }
 }

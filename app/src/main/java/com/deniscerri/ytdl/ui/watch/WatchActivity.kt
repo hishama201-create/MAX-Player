@@ -276,5 +276,10 @@ class WatchActivity : BaseActivity() {
 
     companion object {
         private var current: java.lang.ref.WeakReference<WatchActivity>? = null
+
+        fun isInPip(): Boolean {
+            val activity = current?.get() ?: return false
+            return activity.isInPictureInPictureMode
+        }
     }
 }
