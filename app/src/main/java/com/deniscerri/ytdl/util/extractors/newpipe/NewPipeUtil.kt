@@ -438,4 +438,35 @@ class NewPipeUtil(context: Context) {
         }
         return video
     }
+
+    fun getRelatedAndChannel(url: String): Result<Pair<List<ResultItem>, List<ResultItem>>> {
+        try {
+            val streamInfo = StreamInfo.getInfo(url)
+            val similar = streamInfo.relatedItems
+                .filterIsInstance<StreamInfoItem>()
+                .filter { it.duration > 0 }
+                .mapNotNull { createVideoFromStreamInfoItem(it, it.url) }
+
+            val channel = mutableListOf<ResultItem>()
+            val channelUrl = streamInfo.uploaderUrl
+            if (!channelUrl.isNullOrBlank()) {
+                try {
+                    val info = ChannelInfo.getInfo(ServiceList.YouTube, channelUrl)
+                    val tab = info.tabs.firstOrNull { it.contentFilters.firstOrNull() == "videos" }
+                    if (tab != null) {
+                        val tabInfo = ChannelTabInfo.getInfo(ServiceList.YouTube, tab)
+                        tabInfo.relatedItems
+                            .filterIsInstance<StreamInfoItem>()
+                            .filter { it.duration > 0 }
+                            .mapNotNullTo(channel) { createVideoFromStreamInfoItem(it, it.url) }
+                    }
+                } catch (e: Exception) {
+                    Log.e("NewPipeUtil", e.toString())
+                }
+            }
+            return Result.success(Pair(similar, channel))
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
 }

@@ -45,7 +45,7 @@ class WatchSuggestionsAdapter(
 
     class DiffCallback : DiffUtil.ItemCallback<ResultItem>() {
         override fun areItemsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.url == newItem.url
         }
 
         override fun areContentsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean {

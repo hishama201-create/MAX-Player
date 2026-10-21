@@ -101,14 +101,32 @@
             app:selectionRequired="true"
             app:singleLine="true"
             app:singleSelection="true">
-
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/watch_all" />
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_from_results"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="@string/watch_from_results" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_from_channel"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_from_channel" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_similar"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_similar" />
+
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 

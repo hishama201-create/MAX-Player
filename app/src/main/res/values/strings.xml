@@ -682,4 +682,7 @@
     <string name="embed_lyrics_summary">Fetch lyrics from lrclib.net and embed them in audio downloads</string>
     <string name="save_lrc_file_summary">Save synced lyrics as a .lrc file next to audio downloads</string>
     <string name="watch_from_results">From search results</string>
+    <string name="watch_all">All</string>
+    <string name="watch_from_channel">From the channel</string>
+    <string name="watch_similar">Similar content</string>
 </resources>

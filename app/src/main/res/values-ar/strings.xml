@@ -657,4 +657,7 @@
     <string name="custom_channels">مستودع مخصص</string>
     <string name="custom_channels_summary">التحديث من مستودعات إصدارات yt-dlp الخاصة بك</string>
     <string name="watch_from_results">من نتائج البحث</string>
+    <string name="watch_all">الكلّ</string>
+    <string name="watch_from_channel">من القناة</string>
+    <string name="watch_similar">محتوى مشابه</string>
 </resources>

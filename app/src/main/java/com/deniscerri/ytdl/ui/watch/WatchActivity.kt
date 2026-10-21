@@ -1,17 +1,17 @@
 package com.deniscerri.ytdl.ui.watch
 
 import android.app.PictureInPictureParams
-import androidx.activity.OnBackPressedCallback
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.util.Rational
-import android.view.View
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Rational
+import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -30,18 +30,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.deniscerri.ytdl.R
 import com.deniscerri.ytdl.database.enums.DownloadType
 import com.deniscerri.ytdl.database.models.ResultItem
-import com.deniscerri.ytdl.database.viewmodel.DownloadViewModel
 import com.deniscerri.ytdl.database.viewmodel.DownloadCardViewModel
+import com.deniscerri.ytdl.database.viewmodel.DownloadViewModel
 import com.deniscerri.ytdl.database.viewmodel.ResultViewModel
 import com.deniscerri.ytdl.ui.BaseActivity
 import com.deniscerri.ytdl.util.VideoPlayerUtil
+import com.deniscerri.ytdl.util.extractors.newpipe.NewPipeUtil
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR }
 
 class WatchActivity : BaseActivity() {
     private lateinit var player: ExoPlayer
@@ -53,7 +57,11 @@ class WatchActivity : BaseActivity() {
     private lateinit var suggestionsAdapter: WatchSuggestionsAdapter
     private lateinit var currentItem: ResultItem
     private var allResults: List<ResultItem> = emptyList()
+    private var channelResults: List<ResultItem> = emptyList()
+    private var similarResults: List<ResultItem> = emptyList()
+    private var filter = SuggestionFilter.ALL
     private var playbackJob: Job? = null
+    private var relatedJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +76,7 @@ class WatchActivity : BaseActivity() {
 
         current?.get()?.takeIf { it !== this }?.finish()
         current = java.lang.ref.WeakReference(this)
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         resultViewModel = ViewModelProvider(this)[ResultViewModel::class.java]
         downloadViewModel = ViewModelProvider(this)[DownloadViewModel::class.java]
@@ -87,6 +96,7 @@ class WatchActivity : BaseActivity() {
 
         setupDownloadButtons()
         setupBackHandler()
+        setupChips()
         playItem(item)
         loadSuggestions()
     }
@@ -113,6 +123,21 @@ class WatchActivity : BaseActivity() {
             setOnLongClickListener {
                 onDownloadClick(DownloadType.video, true)
                 true
+            }
+        }
+    }
+
+    private fun setupChips() {
+        mapOf(
+            R.id.chip_all to SuggestionFilter.ALL,
+            R.id.chip_from_results to SuggestionFilter.RESULTS,
+            R.id.chip_from_channel to SuggestionFilter.CHANNEL,
+            R.id.chip_similar to SuggestionFilter.SIMILAR
+        ).forEach { (id, value) ->
+            findViewById<Chip>(id).setOnClickListener {
+                filter = value
+                showSuggestions()
+                findViewById<RecyclerView>(R.id.watch_suggestions).scrollToPosition(0)
             }
         }
     }
@@ -149,8 +174,11 @@ class WatchActivity : BaseActivity() {
         currentItem = item
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
+        channelResults = emptyList()
+        similarResults = emptyList()
         showSuggestions()
         startPlayback(item)
+        loadRelated(item)
     }
 
     private fun loadSuggestions() {
@@ -163,8 +191,36 @@ class WatchActivity : BaseActivity() {
         }
     }
 
+    private fun loadRelated(item: ResultItem) {
+        relatedJob?.cancel()
+        if (!item.url.contains("youtube.com") && !item.url.contains("youtu.be")) return
+        relatedJob = lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    NewPipeUtil(applicationContext).getRelatedAndChannel(item.url)
+                }
+                if (item.url != currentItem.url) return@launch
+                res.onSuccess { related ->
+                    similarResults = related.first
+                    channelResults = related.second
+                    showSuggestions()
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     private fun showSuggestions() {
-        suggestionsAdapter.submitList(allResults.filter { it.url != currentItem.url })
+        val list = when (filter) {
+            SuggestionFilter.RESULTS -> allResults
+            SuggestionFilter.CHANNEL -> channelResults
+            SuggestionFilter.SIMILAR -> similarResults
+            SuggestionFilter.ALL -> allResults + channelResults + similarResults
+        }
+        suggestionsAdapter.submitList(list.distinctBy { it.url }.filter { it.url != currentItem.url })
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
