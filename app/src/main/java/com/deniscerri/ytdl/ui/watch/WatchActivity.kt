@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Rational
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -34,11 +35,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.deniscerri.ytdl.R
 import com.deniscerri.ytdl.database.enums.DownloadType
+import com.deniscerri.ytdl.database.models.ChapterItem
 import com.deniscerri.ytdl.database.models.ResultItem
 import com.deniscerri.ytdl.database.viewmodel.DownloadCardViewModel
 import com.deniscerri.ytdl.database.viewmodel.DownloadViewModel
 import com.deniscerri.ytdl.database.viewmodel.ResultViewModel
 import com.deniscerri.ytdl.ui.BaseActivity
+import com.deniscerri.ytdl.util.Extensions.toStringDuration
 import com.deniscerri.ytdl.util.VideoPlayerUtil
 import com.deniscerri.ytdl.util.extractors.newpipe.NewPipeUtil
 import com.google.android.material.button.MaterialButton
@@ -49,6 +52,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR }
 
@@ -61,6 +65,7 @@ class WatchActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var suggestionsAdapter: WatchSuggestionsAdapter
     private lateinit var currentItem: ResultItem
+    private var chapters: List<ChapterItem> = emptyList()
     private var allResults: List<ResultItem> = emptyList()
     private var channelResults: List<ResultItem> = emptyList()
     private var similarResults: List<ResultItem> = emptyList()
@@ -254,16 +259,19 @@ class WatchActivity : BaseActivity() {
         player.stop()
         player.clearMediaItems()
         loading.isVisible = true
+        showChapters(emptyList())
 
         playbackJob = lifecycleScope.launch {
             try {
-                val urls = withContext(Dispatchers.IO) {
+                val data = withContext(Dispatchers.IO) {
                     if (item.urls.isEmpty()) {
-                        resultViewModel.getStreamingUrlAndChapters(item.url).first
+                        resultViewModel.getStreamingUrlAndChapters(item.url)
                     } else {
-                        item.urls.split("\n")
+                        Pair(item.urls.split("\n"), item.chapters)
                     }
                 }
+                val urls = data.first
+                showChapters(data.second ?: emptyList())
                 if (urls.isEmpty()) throw Exception("No Data found!")
 
                 if (urls.size == 2) {
@@ -341,6 +349,7 @@ class WatchActivity : BaseActivity() {
         others.forEach { findViewById<View>(it).isVisible = !inPip && !isLandscape() }
         findViewById<PlayerView>(R.id.watch_player).useController = !inPip
         updateEmptyState(inPip)
+        updateChaptersRow()
     }
 
     private fun setupBackHandler() {
@@ -398,6 +407,7 @@ class WatchActivity : BaseActivity() {
             R.id.watch_suggestions
         ).forEach { findViewById<View>(it).isVisible = !fullscreen }
         updateEmptyState()
+        updateChaptersRow()
 
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         if (fullscreen) {
@@ -434,5 +444,34 @@ class WatchActivity : BaseActivity() {
         } else {
             emptyView.isVisible = false
         }
+    }
+
+    private fun showChapters(list: List<ChapterItem>) {
+        chapters = list.filter { !(it.start_time == 0L && it.end_time == 0L) }
+        val container = findViewById<LinearLayout>(R.id.watch_chapters_container)
+        container.removeAllViews()
+        val gap = (8 * resources.displayMetrics.density).toInt()
+        chapters.forEach { chapter ->
+            val chip = Chip(this)
+            chip.text = "${chapter.start_time.toInt().toStringDuration(Locale.US)}  ${chapter.title}"
+            chip.setOnClickListener {
+                if (::player.isInitialized) {
+                    player.seekTo(chapter.start_time * 1000)
+                    player.play()
+                }
+            }
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = gap
+            container.addView(chip, params)
+        }
+        updateChaptersRow()
+    }
+
+    private fun updateChaptersRow() {
+        val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
+        findViewById<View>(R.id.watch_chapters_scroll).isVisible = chapters.isNotEmpty() && chipsShown
     }
 }
