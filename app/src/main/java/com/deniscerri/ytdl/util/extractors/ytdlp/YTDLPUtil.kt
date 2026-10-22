@@ -1019,7 +1019,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
             //request.addOption("--external-downloader-args", "aria2c:\"--check-certificate=false\"")
         }
 
-        val concurrentFragments = sharedPreferences.getInt("concurrent_fragments", 1)
+        val concurrentFragments = sharedPreferences.getInt("concurrent_fragments", 8)
         if (concurrentFragments > 1) request.addOption("-N", concurrentFragments)
 
         val retries = sharedPreferences.getString("retries", "")!!
