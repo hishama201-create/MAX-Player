@@ -67,6 +67,9 @@ class WatchActivity : BaseActivity() {
     private var filter = SuggestionFilter.ALL
     private var playbackJob: Job? = null
     private var relatedJob: Job? = null
+    private var resultsLoading = true
+    private var relatedLoading = false
+    private var lastListEmpty = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -194,13 +197,20 @@ class WatchActivity : BaseActivity() {
                 resultViewModel.getAllIds().mapNotNull { resultViewModel.getByID(it) }
             }
             allResults = items
+            resultsLoading = false
             showSuggestions()
         }
     }
 
     private fun loadRelated(item: ResultItem) {
         relatedJob?.cancel()
-        if (!item.url.contains("youtube.com") && !item.url.contains("youtu.be")) return
+        relatedLoading = false
+        if (!item.url.contains("youtube.com") && !item.url.contains("youtu.be")) {
+            showSuggestions()
+            return
+        }
+        relatedLoading = true
+        showSuggestions()
         relatedJob = lifecycleScope.launch {
             try {
                 val res = withContext(Dispatchers.IO) {
@@ -210,12 +220,16 @@ class WatchActivity : BaseActivity() {
                 res.onSuccess { related ->
                     similarResults = related.first
                     channelResults = related.second
-                    showSuggestions()
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                if (isActive) {
+                    relatedLoading = false
+                    showSuggestions()
+                }
             }
         }
     }
@@ -227,7 +241,10 @@ class WatchActivity : BaseActivity() {
             SuggestionFilter.SIMILAR -> similarResults
             SuggestionFilter.ALL -> allResults + channelResults + similarResults
         }
-        suggestionsAdapter.submitList(list.distinctBy { it.url }.filter { it.url != currentItem.url })
+        val shown = list.distinctBy { it.url }.filter { it.url != currentItem.url }
+        suggestionsAdapter.submitList(shown)
+        lastListEmpty = shown.isEmpty()
+        updateEmptyState()
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -323,6 +340,7 @@ class WatchActivity : BaseActivity() {
         )
         others.forEach { findViewById<View>(it).isVisible = !inPip && !isLandscape() }
         findViewById<PlayerView>(R.id.watch_player).useController = !inPip
+        updateEmptyState(inPip)
     }
 
     private fun setupBackHandler() {
@@ -379,6 +397,7 @@ class WatchActivity : BaseActivity() {
             R.id.watch_chips_scroll,
             R.id.watch_suggestions
         ).forEach { findViewById<View>(it).isVisible = !fullscreen }
+        updateEmptyState()
 
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         if (fullscreen) {
@@ -396,6 +415,24 @@ class WatchActivity : BaseActivity() {
         if (!isInPictureInPictureMode) applyFullscreen(landscape)
         if (!landscape && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+
+    private fun isListLoading(): Boolean = when (filter) {
+        SuggestionFilter.RESULTS -> resultsLoading
+        SuggestionFilter.CHANNEL, SuggestionFilter.SIMILAR -> relatedLoading
+        SuggestionFilter.ALL -> resultsLoading || relatedLoading
+    }
+
+    private fun updateEmptyState(inPip: Boolean = isInPictureInPictureMode) {
+        val emptyView = findViewById<TextView>(R.id.watch_empty)
+        if (lastListEmpty && !inPip && !isLandscape()) {
+            emptyView.setText(
+                if (isListLoading()) R.string.watch_loading_list else R.string.watch_empty_list
+            )
+            emptyView.isVisible = true
+        } else {
+            emptyView.isVisible = false
         }
     }
 }

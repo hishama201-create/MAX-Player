@@ -660,4 +660,6 @@
     <string name="watch_all">الكلّ</string>
     <string name="watch_from_channel">من القناة</string>
     <string name="watch_similar">محتوى مشابه</string>
+    <string name="watch_loading_list">جارٍ التحميل…</string>
+    <string name="watch_empty_list">لا توجد فيديوهات لعرضها</string>
 </resources>
