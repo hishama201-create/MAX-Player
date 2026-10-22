@@ -28,41 +28,64 @@
         app:layout_constraintStart_toStartOf="@id/watch_player"
         app:layout_constraintEnd_toEndOf="@id/watch_player" />
 
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/watch_coordinator"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/watch_player"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/watch_appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            app:elevation="0dp">
+
+            <LinearLayout
+                android:id="@+id/watch_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll">
     <TextView
         android:id="@+id/watch_title"
         android:ellipsize="end"
         android:maxLines="2"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:textColor="?attr/colorOnSurface"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/watch_player"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
+
+ />
 
     <TextView
         android:id="@+id/watch_author"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@id/watch_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
+
+ />
 
     <LinearLayout
         android:id="@+id/watch_actions"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
         android:paddingTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/watch_author"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+
+
+>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/watch_download_audio"
@@ -88,15 +111,15 @@
 
     <HorizontalScrollView
         android:id="@+id/watch_chapters_scroll"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="12dp"
         android:paddingTop="8dp"
         android:scrollbars="none"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/watch_actions"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+
+
+>
 
         <LinearLayout
             android:id="@+id/watch_chapters_container"
@@ -104,17 +127,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" />
     </HorizontalScrollView>
+            </LinearLayout>
 
     <HorizontalScrollView
         android:id="@+id/watch_chips_scroll"
-        android:layout_width="0dp"
+        android:background="?attr/colorSurface"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/watch_chapters_scroll"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+
+
+>
 
         <com.google.android.material.chip.ChipGroup
             android:layout_width="wrap_content"
@@ -151,28 +176,27 @@
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
-    <TextView
-        android:id="@+id/watch_empty"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:padding="16dp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="14sp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/watch_chips_scroll"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/watch_suggestions"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/watch_chips_scroll"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:id="@+id/watch_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/watch_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/watch_nav_host"
