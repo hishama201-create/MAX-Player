@@ -185,7 +185,24 @@ class WatchActivity : BaseActivity() {
         navController.navigate(R.id.downloadBottomSheetDialog, bundle)
     }
 
+    private fun savePosition() {
+        if (!::player.isInitialized || !::currentItem.isInitialized) return
+        if (player.playbackState == androidx.media3.common.Player.STATE_IDLE) return
+        val dur = player.duration
+        if (dur == androidx.media3.common.C.TIME_UNSET) return
+        val pos = player.currentPosition
+        val edit = getSharedPreferences("watch_positions", MODE_PRIVATE).edit()
+        if (pos < 10000 || dur - pos < 10000) edit.remove(currentItem.url) else edit.putLong(currentItem.url, pos)
+        edit.apply()
+    }
+
+    private fun restorePosition(item: ResultItem) {
+        val pos = getSharedPreferences("watch_positions", MODE_PRIVATE).getLong(item.url, 0L)
+        if (pos > 0L) player.seekTo(pos)
+    }
+
     private fun playItem(item: ResultItem) {
+        savePosition()
         currentItem = item
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
@@ -284,6 +301,7 @@ class WatchActivity : BaseActivity() {
                 } else {
                     player.setMediaItem(MediaItem.fromUri(Uri.parse(urls[0])))
                 }
+                restorePosition(item)
                 player.prepare()
                 player.play()
             } catch (e: CancellationException) {
@@ -298,6 +316,7 @@ class WatchActivity : BaseActivity() {
 
     override fun onStop() {
         super.onStop()
+        savePosition()
         if (::player.isInitialized) player.pause()
     }
 
