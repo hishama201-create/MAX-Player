@@ -1,6 +1,7 @@
 package com.deniscerri.ytdl.ui.watch
 
 import android.app.PictureInPictureParams
+import android.content.pm.ActivityInfo
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
@@ -13,6 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -97,8 +102,10 @@ class WatchActivity : BaseActivity() {
         setupDownloadButtons()
         setupBackHandler()
         setupChips()
+        setupFullscreen()
         playItem(item)
         loadSuggestions()
+        applyFullscreen(isLandscape())
     }
 
     @Suppress("DEPRECATION")
@@ -314,7 +321,7 @@ class WatchActivity : BaseActivity() {
             R.id.watch_chips_scroll,
             R.id.watch_suggestions
         )
-        others.forEach { findViewById<View>(it).isVisible = !inPip }
+        others.forEach { findViewById<View>(it).isVisible = !inPip && !isLandscape() }
         findViewById<PlayerView>(R.id.watch_player).useController = !inPip
     }
 
@@ -336,6 +343,59 @@ class WatchActivity : BaseActivity() {
         fun isInPip(): Boolean {
             val activity = current?.get() ?: return false
             return activity.isInPictureInPictureMode
+        }
+    }
+
+    private fun isLandscape(): Boolean =
+        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun setupFullscreen() {
+        findViewById<PlayerView>(R.id.watch_player).setFullscreenButtonClickListener {
+            requestedOrientation = if (isLandscape()) {
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            } else {
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }
+        }
+    }
+
+    private fun applyFullscreen(fullscreen: Boolean) {
+        val playerView = findViewById<PlayerView>(R.id.watch_player)
+        val params = playerView.layoutParams as ConstraintLayout.LayoutParams
+        if (fullscreen) {
+            params.dimensionRatio = null
+            params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        } else {
+            params.dimensionRatio = "16:9"
+            params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+        }
+        playerView.layoutParams = params
+
+        listOf(
+            R.id.watch_title,
+            R.id.watch_author,
+            R.id.watch_actions,
+            R.id.watch_chips_scroll,
+            R.id.watch_suggestions
+        ).forEach { findViewById<View>(it).isVisible = !fullscreen }
+
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        if (fullscreen) {
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val landscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (!isInPictureInPictureMode) applyFullscreen(landscape)
+        if (!landscape && requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 }
