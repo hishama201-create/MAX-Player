@@ -87,13 +87,32 @@
     </LinearLayout>
 
     <HorizontalScrollView
+        android:id="@+id/watch_chapters_scroll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/watch_actions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/watch_chapters_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <HorizontalScrollView
         android:id="@+id/watch_chips_scroll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/watch_actions"
+        app:layout_constraintTop_toBottomOf="@id/watch_chapters_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
