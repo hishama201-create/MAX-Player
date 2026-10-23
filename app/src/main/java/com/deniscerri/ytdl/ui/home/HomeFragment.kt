@@ -906,15 +906,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
     }
 
     override fun onCardDetailsClick(item: ResultItem) {
-        if (parentFragmentManager.findFragmentByTag("resultDetails") == null){
-            val bundle = Bundle()
-            bundle.putParcelable("result", item)
-            startActivity(android.content.Intent(requireContext(), com.deniscerri.ytdl.ui.watch.WatchActivity::class.java).putExtra("result", item))
-        }
-    }
-
     override fun onClick(v: View) {
-        val viewIdName: String = try {
             v.tag.toString()
         } catch (e: Exception) {""}
         if (viewIdName.isNotEmpty()) {
