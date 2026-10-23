@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR }
+private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR, FAVORITES }
 
 class WatchActivity : BaseActivity() {
     private lateinit var player: ExoPlayer
@@ -108,6 +108,7 @@ class WatchActivity : BaseActivity() {
         }
 
         setupDownloadButtons()
+        setupFavoriteButton()
         setupBackHandler()
         setupChips()
         setupFullscreen()
@@ -123,6 +124,20 @@ class WatchActivity : BaseActivity() {
         } else {
             intent.getParcelableExtra("result")
         }
+    }
+
+    private fun setupFavoriteButton() {
+        findViewById<MaterialButton>(R.id.watch_favorite).setOnClickListener {
+            val nowFav = FavoritesStore.toggle(this, currentItem)
+            updateFavoriteIcon()
+            Toast.makeText(this, if (nowFav) R.string.watch_fav_added else R.string.watch_fav_removed, Toast.LENGTH_SHORT).show()
+            if (filter == SuggestionFilter.FAVORITES) showSuggestions()
+        }
+    }
+
+    private fun updateFavoriteIcon() {
+        val fav = FavoritesStore.isFavorite(this, currentItem.url)
+        findViewById<MaterialButton>(R.id.watch_favorite).setIconResource(if (fav) R.drawable.ic_watch_fav_on else R.drawable.ic_watch_fav_off)
     }
 
     private fun setupDownloadButtons() {
@@ -147,7 +162,8 @@ class WatchActivity : BaseActivity() {
             R.id.chip_all to SuggestionFilter.ALL,
             R.id.chip_from_results to SuggestionFilter.RESULTS,
             R.id.chip_from_channel to SuggestionFilter.CHANNEL,
-            R.id.chip_similar to SuggestionFilter.SIMILAR
+            R.id.chip_similar to SuggestionFilter.SIMILAR,
+            R.id.chip_favorites to SuggestionFilter.FAVORITES
         ).forEach { (id, value) ->
             findViewById<Chip>(id).setOnClickListener {
                 filter = value
@@ -204,6 +220,7 @@ class WatchActivity : BaseActivity() {
     private fun playItem(item: ResultItem) {
         savePosition()
         currentItem = item
+        updateFavoriteIcon()
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
         channelResults = emptyList()
@@ -262,6 +279,7 @@ class WatchActivity : BaseActivity() {
             SuggestionFilter.CHANNEL -> channelResults
             SuggestionFilter.SIMILAR -> similarResults
             SuggestionFilter.ALL -> allResults + channelResults + similarResults
+            SuggestionFilter.FAVORITES -> FavoritesStore.getAll(this)
         }
         val shown = list.distinctBy { it.url }.filter { it.url != currentItem.url }
         suggestionsAdapter.submitList(shown)
@@ -451,6 +469,7 @@ class WatchActivity : BaseActivity() {
         SuggestionFilter.RESULTS -> resultsLoading
         SuggestionFilter.CHANNEL, SuggestionFilter.SIMILAR -> relatedLoading
         SuggestionFilter.ALL -> resultsLoading || relatedLoading
+        SuggestionFilter.FAVORITES -> false
     }
 
     private fun updateEmptyState(inPip: Boolean = isInPictureInPictureMode) {

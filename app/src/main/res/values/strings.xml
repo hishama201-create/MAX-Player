@@ -685,6 +685,9 @@
     <string name="watch_all">All</string>
     <string name="watch_from_channel">From the channel</string>
     <string name="watch_similar">Similar content</string>
+    <string name="watch_favorites">Favorites</string>
+    <string name="watch_fav_added">Added to favorites</string>
+    <string name="watch_fav_removed">Removed from favorites</string>
     <string name="watch_loading_list">Loading…</string>
     <string name="watch_empty_list">No videos to show</string>
 </resources>

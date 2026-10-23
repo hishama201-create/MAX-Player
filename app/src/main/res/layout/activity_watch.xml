@@ -107,6 +107,16 @@
             android:elevation="0dp"
             android:outlineProvider="none"
             app:icon="@drawable/ic_video" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/watch_favorite"
+            style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Secondary"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/watch_favorites"
+            android:elevation="0dp"
+            android:outlineProvider="none"
+            app:icon="@drawable/ic_watch_fav_off" />
     </LinearLayout>
 
     <HorizontalScrollView
@@ -173,6 +183,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/watch_similar" />
 
+                <com.google.android.material.chip.Chip
+                android:id="@+id/chip_favorites"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_favorites" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
