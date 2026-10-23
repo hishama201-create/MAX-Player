@@ -99,6 +99,9 @@ class WatchActivity : BaseActivity() {
         navController = navHost.navController
 
         player = VideoPlayerUtil.buildPlayer(this)
+        player.setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
+        com.deniscerri.ytdl.services.WatchPlaybackService.player = player
+        androidx.core.content.ContextCompat.startForegroundService(this, android.content.Intent(this, com.deniscerri.ytdl.services.WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.watch_player).player = player
 
         suggestionsAdapter = WatchSuggestionsAdapter { playItem(it) }
@@ -221,6 +224,8 @@ class WatchActivity : BaseActivity() {
         savePosition()
         currentItem = item
         updateFavoriteIcon()
+        com.deniscerri.ytdl.services.WatchPlaybackService.title = item.title.toString()
+        com.deniscerri.ytdl.services.WatchPlaybackService.author = item.author.toString()
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
         channelResults = emptyList()
@@ -335,11 +340,14 @@ class WatchActivity : BaseActivity() {
     override fun onStop() {
         super.onStop()
         savePosition()
-        if (::player.isInitialized) player.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        if (::player.isInitialized && com.deniscerri.ytdl.services.WatchPlaybackService.player === player) {
+            com.deniscerri.ytdl.services.WatchPlaybackService.player = null
+            stopService(android.content.Intent(this, com.deniscerri.ytdl.services.WatchPlaybackService::class.java))
+        }
         if (::player.isInitialized) player.release()
         if (current?.get() === this) current = null
     }
