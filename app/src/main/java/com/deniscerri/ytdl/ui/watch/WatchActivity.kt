@@ -381,6 +381,9 @@ class WatchActivity : BaseActivity() {
     ) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         setPipUi(isInPictureInPictureMode)
+        if (lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) {
+            finish()
+        }
     }
 
     private fun setPipUi(inPip: Boolean) {
