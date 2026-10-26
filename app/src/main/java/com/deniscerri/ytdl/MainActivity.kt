@@ -126,7 +126,7 @@ class MainActivity : BaseActivity() {
         downloadCardViewModel = ViewModelProvider(this)[DownloadCardViewModel::class.java]
         preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-        if (preferences.getBoolean("incognito", false)) {
+        if (preferences.getBoolean("incognito", false) || (savedInstanceState == null && intent.action == Intent.ACTION_MAIN)) {
             lifecycleScope.launch(Dispatchers.IO){
                 resultViewModel.deleteAll()
             }
