@@ -249,6 +249,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/watch_favorites" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_history"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_history" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 

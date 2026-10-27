@@ -661,6 +661,7 @@
     <string name="watch_from_channel">من القناة</string>
     <string name="watch_similar">محتوى مشابه</string>
     <string name="watch_favorites">المفضلة</string>
+    <string name="watch_history">شاهدتها مؤخراً</string>
     <string name="watch_fav_added">أُضيف إلى المفضلة</string>
     <string name="watch_fav_removed">أُزيل من المفضلة</string>
     <string name="watch_loading_list">جارٍ التحميل…</string>

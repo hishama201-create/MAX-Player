@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR, FAVORITES }
+private enum class SuggestionFilter { ALL, RESULTS, CHANNEL, SIMILAR, FAVORITES, HISTORY }
 
 class WatchActivity : BaseActivity() {
     private lateinit var player: ExoPlayer
@@ -169,7 +169,8 @@ class WatchActivity : BaseActivity() {
             R.id.chip_from_results to SuggestionFilter.RESULTS,
             R.id.chip_from_channel to SuggestionFilter.CHANNEL,
             R.id.chip_similar to SuggestionFilter.SIMILAR,
-            R.id.chip_favorites to SuggestionFilter.FAVORITES
+            R.id.chip_favorites to SuggestionFilter.FAVORITES,
+            R.id.chip_history to SuggestionFilter.HISTORY
         ).forEach { (id, value) ->
             findViewById<Chip>(id).setOnClickListener {
                 filter = value
@@ -294,6 +295,7 @@ class WatchActivity : BaseActivity() {
             SuggestionFilter.SIMILAR -> similarResults
             SuggestionFilter.ALL -> allResults + channelResults + similarResults
             SuggestionFilter.FAVORITES -> FavoritesStore.getAll(this)
+            SuggestionFilter.HISTORY -> HistoryStore.getAll(this)
         }
         val shown = list.distinctBy { it.url }.filter { it.url != currentItem.url }
         suggestionsAdapter.submitList(shown)
@@ -336,6 +338,7 @@ class WatchActivity : BaseActivity() {
                 restorePosition(item)
                 player.prepare()
                 player.play()
+                HistoryStore.add(this@WatchActivity, item)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -492,6 +495,7 @@ class WatchActivity : BaseActivity() {
         SuggestionFilter.CHANNEL, SuggestionFilter.SIMILAR -> relatedLoading
         SuggestionFilter.ALL -> resultsLoading || relatedLoading
         SuggestionFilter.FAVORITES -> false
+        SuggestionFilter.HISTORY -> false
     }
 
     private fun updateEmptyState(inPip: Boolean = isInPictureInPictureMode) {
