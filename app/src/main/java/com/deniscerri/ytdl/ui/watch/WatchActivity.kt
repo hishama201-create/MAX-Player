@@ -114,6 +114,7 @@ class WatchActivity : BaseActivity() {
         setupFavoriteButton()
         setupShareButtons()
         setupSleepTimer()
+        findViewById<TextView>(R.id.watch_description).setOnClickListener { v -> val t = v as TextView; t.maxLines = if (t.maxLines == 3) Int.MAX_VALUE else 3 }
         setupBackHandler()
         setupChips()
         setupFullscreen()
@@ -231,6 +232,7 @@ class WatchActivity : BaseActivity() {
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
         channelResults = emptyList()
+        updateMetaRow("", "")
         similarResults = emptyList()
         showSuggestions()
         startPlayback(item)
@@ -266,6 +268,11 @@ class WatchActivity : BaseActivity() {
                 res.onSuccess { related ->
                     similarResults = related.first
                     channelResults = related.second
+                    val m = related.third
+                    val parts = mutableListOf<String>()
+                    if (m.views >= 0) parts.add(getString(R.string.watch_views, java.text.NumberFormat.getInstance().format(m.views)))
+                    if (m.dateMillis > 0) parts.add(java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(m.dateMillis)))
+                    updateMetaRow(parts.joinToString(getString(R.string.watch_meta_sep)), m.description)
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -400,6 +407,7 @@ class WatchActivity : BaseActivity() {
         findViewById<PlayerView>(R.id.watch_player).useController = !inPip
         updateEmptyState(inPip)
         updateChaptersRow()
+        updateMetaRow()
     }
 
     private fun setupBackHandler() {
@@ -458,6 +466,7 @@ class WatchActivity : BaseActivity() {
         ).forEach { findViewById<View>(it).isVisible = !fullscreen }
         updateEmptyState()
         updateChaptersRow()
+        updateMetaRow()
 
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         if (fullscreen) {
@@ -519,11 +528,22 @@ class WatchActivity : BaseActivity() {
             container.addView(chip, params)
         }
         updateChaptersRow()
+        updateMetaRow()
     }
 
     private fun updateChaptersRow() {
         val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
         findViewById<View>(R.id.watch_chapters_scroll).isVisible = chapters.isNotEmpty() && chipsShown
+    }
+
+    private fun updateMetaRow(stats: String? = null, desc: String? = null) {
+        val meta = findViewById<TextView>(R.id.watch_meta)
+        val description = findViewById<TextView>(R.id.watch_description)
+        if (stats != null) meta.text = stats
+        if (desc != null) description.text = desc
+        val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
+        meta.isVisible = meta.text.isNotEmpty() && chipsShown
+        description.isVisible = description.text.isNotEmpty() && chipsShown
     }
 
     private fun setupShareButtons() {

@@ -670,4 +670,6 @@
     <string name="watch_sleep_minutes">%d دقيقة</string>
     <string name="watch_sleep_set">سيتوقف التشغيل بعد %d دقيقة</string>
     <string name="watch_sleep_cancelled">أُلغي مؤقت النوم</string>
+    <string name="watch_views">%1$s مشاهدة</string>
+    <string name="watch_meta_sep"> • </string>
 </resources>

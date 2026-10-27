@@ -695,4 +695,6 @@
     <string name="watch_sleep_minutes">%d minutes</string>
     <string name="watch_sleep_set">Playback will pause in %d minutes</string>
     <string name="watch_sleep_cancelled">Sleep timer turned off</string>
+    <string name="watch_views">%1$s views</string>
+    <string name="watch_meta_sep"> • </string>
 </resources>

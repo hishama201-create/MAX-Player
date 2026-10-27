@@ -32,6 +32,12 @@ import org.schabi.newpipe.extractor.stream.StreamInfoItem
 import java.util.Locale
 import kotlin.coroutines.cancellation.CancellationException
 
+data class WatchMeta(
+    val views: Long,
+    val dateMillis: Long,
+    val description: String
+)
+
 class NewPipeUtil(context: Context) {
     private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val countryCode = sharedPreferences.getString("locale", "")!!.ifEmpty { "US" }
@@ -439,9 +445,21 @@ class NewPipeUtil(context: Context) {
         return video
     }
 
-    fun getRelatedAndChannel(url: String): Result<Pair<List<ResultItem>, List<ResultItem>>> {
+    fun getRelatedAndChannel(url: String): Result<Triple<List<ResultItem>, List<ResultItem>, WatchMeta>> {
         try {
             val streamInfo = StreamInfo.getInfo(url)
+            val meta = WatchMeta(
+                views = streamInfo.viewCount,
+                dateMillis = runCatching {
+                    streamInfo.uploadDate?.offsetDateTime()?.toInstant()?.toEpochMilli() ?: 0L
+                }.getOrDefault(0L),
+                description = runCatching {
+                    val d = streamInfo.description
+                    if (d.type == org.schabi.newpipe.extractor.stream.Description.HTML) {
+                        androidx.core.text.HtmlCompat.fromHtml(d.content, androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY).toString().trim()
+                    } else d.content.trim()
+                }.getOrDefault("")
+            )
             val similar = streamInfo.relatedItems
                 .filterIsInstance<StreamInfoItem>()
                 .filter { it.duration > 0 }
@@ -464,7 +482,7 @@ class NewPipeUtil(context: Context) {
                     Log.e("NewPipeUtil", e.toString())
                 }
             }
-            return Result.success(Pair(similar, channel))
+            return Result.success(Triple(similar, channel, meta))
         } catch (e: Exception) {
             return Result.failure(e)
         }
