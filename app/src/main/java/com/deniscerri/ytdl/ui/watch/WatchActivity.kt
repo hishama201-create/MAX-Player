@@ -75,6 +75,7 @@ class WatchActivity : BaseActivity() {
     private var resultsLoading = true
     private var relatedLoading = false
     private var lastListEmpty = false
+    private var selectedHeight = 720
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +115,21 @@ class WatchActivity : BaseActivity() {
         setupFavoriteButton()
         setupShareButtons()
         setupSleepTimer()
+        findViewById<MaterialButton>(R.id.watch_quality).setOnClickListener {
+            val heights = intArrayOf(360, 480, 720, 1080)
+            val labels = heights.map { getString(R.string.watch_quality_p, it) }.toTypedArray()
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.watch_quality)
+                .setSingleChoiceItems(labels, heights.indexOf(selectedHeight)) { d, which ->
+                    d.dismiss()
+                    if (heights[which] != selectedHeight) {
+                        selectedHeight = heights[which]
+                        savePosition()
+                        startPlayback(currentItem)
+                    }
+                }
+                .show()
+        }
         findViewById<TextView>(R.id.watch_description).setOnClickListener { v -> val t = v as TextView; t.maxLines = if (t.maxLines == 3) Int.MAX_VALUE else 3 }
         setupBackHandler()
         setupChips()
@@ -315,8 +331,8 @@ class WatchActivity : BaseActivity() {
         playbackJob = lifecycleScope.launch {
             try {
                 val data = withContext(Dispatchers.IO) {
-                    if (item.urls.isEmpty()) {
-                        resultViewModel.getStreamingUrlAndChapters(item.url)
+                    if (item.urls.isEmpty() || selectedHeight != 720) {
+                        resultViewModel.getStreamingUrlAndChapters(item.url, selectedHeight)
                     } else {
                         Pair(item.urls.split("\n"), item.chapters)
                     }

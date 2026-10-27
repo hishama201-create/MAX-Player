@@ -660,12 +660,12 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
     }
 
 
-    suspend fun getStreamingUrlAndChapters(url: String) : Result<Pair<List<String>, List<ChapterItem>?>> {
+    suspend fun getStreamingUrlAndChapters(url: String, maxHeight: Int = 720) : Result<Pair<List<String>, List<ChapterItem>?>> {
         try {
             val request = YTDLRequest(url)
             //request.addOption("--get-url")
             request.addOption("--print", "%(.{urls,chapters})s")
-            request.addOption("-S", "res:720,+proto:m3u8")
+            request.addOption("-S", "res:$maxHeight,+proto:m3u8")
             request.applyDefaultOptionsForFetchingData(url)
             if (url.isYoutubeURL()) {
                 request.setYoutubeExtractorArgs(url)

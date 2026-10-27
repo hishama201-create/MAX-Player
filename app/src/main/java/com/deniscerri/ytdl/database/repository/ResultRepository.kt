@@ -92,7 +92,7 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
         return GoogleApiUtil.getSearchSuggestions(searchQuery)
     }
 
-    suspend fun getStreamingUrlAndChapters(url: String) : Pair<List<String>, List<ChapterItem>?> {
+    suspend fun getStreamingUrlAndChapters(url: String, maxHeight: Int = 720) : Pair<List<String>, List<ChapterItem>?> {
 //        val newPipeTrial = if (isUsingNewPipeExtractorDataFetching()) {
 //            newPipeUtil.getStreamingUrlAndChapters(url)
 //        }else {
@@ -103,7 +103,7 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
 //            return res.getOrDefault(Pair(listOf(""), null))
 //        }
 
-        return ytdlpUtil.getStreamingUrlAndChapters(url)
+        return ytdlpUtil.getStreamingUrlAndChapters(url, maxHeight)
             .getOrDefault(Pair(listOf(""), null))
     }
 

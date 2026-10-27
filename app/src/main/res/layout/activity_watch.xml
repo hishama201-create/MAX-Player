@@ -177,6 +177,17 @@
             android:elevation="0dp"
             android:outlineProvider="none"
             app:icon="@drawable/ic_watch_timer" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/watch_quality"
+            style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Secondary"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/watch_quality"
+            android:elevation="0dp"
+            android:outlineProvider="none"
+            app:icon="@drawable/ic_watch_quality" />
     </LinearLayout>
 
     <HorizontalScrollView

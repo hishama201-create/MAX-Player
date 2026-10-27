@@ -500,8 +500,8 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
         return repository.getSearchSuggestions(searchQuery)
     }
 
-    suspend fun getStreamingUrlAndChapters(url: String) : Pair<List<String>, List<ChapterItem>?> {
-        return repository.getStreamingUrlAndChapters(url)
+    suspend fun getStreamingUrlAndChapters(url: String, maxHeight: Int = 720) : Pair<List<String>, List<ChapterItem>?> {
+        return repository.getStreamingUrlAndChapters(url, maxHeight)
     }
 
     fun getItemIDsNotPresentIn(not: List<Long>) : List<Long> {

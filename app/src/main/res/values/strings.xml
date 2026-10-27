@@ -687,6 +687,8 @@
     <string name="watch_similar">Similar content</string>
     <string name="watch_favorites">Favorites</string>
     <string name="watch_history">Recently watched</string>
+    <string name="watch_quality">Video quality</string>
+    <string name="watch_quality_p">%dp</string>
     <string name="watch_fav_added">Added to favorites</string>
     <string name="watch_fav_removed">Removed from favorites</string>
     <string name="watch_loading_list">Loading…</string>
