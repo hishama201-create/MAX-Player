@@ -112,6 +112,7 @@ class WatchActivity : BaseActivity() {
 
         setupDownloadButtons()
         setupFavoriteButton()
+        setupShareButtons()
         setupBackHandler()
         setupChips()
         setupFullscreen()
@@ -522,5 +523,21 @@ class WatchActivity : BaseActivity() {
     private fun updateChaptersRow() {
         val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
         findViewById<View>(R.id.watch_chapters_scroll).isVisible = chapters.isNotEmpty() && chipsShown
+    }
+
+    private fun setupShareButtons() {
+        findViewById<MaterialButton>(R.id.watch_share).setOnClickListener {
+            val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(android.content.Intent.EXTRA_SUBJECT, currentItem.title)
+                putExtra(android.content.Intent.EXTRA_TEXT, currentItem.url)
+            }
+            startActivity(android.content.Intent.createChooser(send, getString(R.string.share)))
+        }
+        findViewById<MaterialButton>(R.id.watch_copy_link).setOnClickListener {
+            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText(currentItem.title, currentItem.url))
+            Toast.makeText(this, R.string.link_copied_to_clipboard, Toast.LENGTH_SHORT).show()
+        }
     }
 }

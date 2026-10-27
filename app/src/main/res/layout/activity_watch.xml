@@ -117,6 +117,26 @@
             android:elevation="0dp"
             android:outlineProvider="none"
             app:icon="@drawable/ic_watch_fav_off" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/watch_share"
+            style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Secondary"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/share"
+            android:elevation="0dp"
+            android:outlineProvider="none"
+            app:icon="@drawable/ic_watch_share" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/watch_copy_link"
+            style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Secondary"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/copy_url"
+            android:elevation="0dp"
+            android:outlineProvider="none"
+            app:icon="@drawable/ic_watch_copy" />
     </LinearLayout>
 
     <HorizontalScrollView
