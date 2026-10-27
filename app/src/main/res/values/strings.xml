@@ -690,4 +690,9 @@
     <string name="watch_fav_removed">Removed from favorites</string>
     <string name="watch_loading_list">Loading…</string>
     <string name="watch_empty_list">No videos to show</string>
+    <string name="watch_sleep_timer">Sleep timer</string>
+    <string name="watch_sleep_off">Off</string>
+    <string name="watch_sleep_minutes">%d minutes</string>
+    <string name="watch_sleep_set">Playback will pause in %d minutes</string>
+    <string name="watch_sleep_cancelled">Sleep timer turned off</string>
 </resources>

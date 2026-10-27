@@ -665,4 +665,9 @@
     <string name="watch_fav_removed">أُزيل من المفضلة</string>
     <string name="watch_loading_list">جارٍ التحميل…</string>
     <string name="watch_empty_list">لا توجد فيديوهات لعرضها</string>
+    <string name="watch_sleep_timer">مؤقت النوم</string>
+    <string name="watch_sleep_off">إيقاف</string>
+    <string name="watch_sleep_minutes">%d دقيقة</string>
+    <string name="watch_sleep_set">سيتوقف التشغيل بعد %d دقيقة</string>
+    <string name="watch_sleep_cancelled">أُلغي مؤقت النوم</string>
 </resources>

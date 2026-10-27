@@ -113,6 +113,7 @@ class WatchActivity : BaseActivity() {
         setupDownloadButtons()
         setupFavoriteButton()
         setupShareButtons()
+        setupSleepTimer()
         setupBackHandler()
         setupChips()
         setupFullscreen()
@@ -538,6 +539,39 @@ class WatchActivity : BaseActivity() {
             val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             clipboard.setPrimaryClip(android.content.ClipData.newPlainText(currentItem.title, currentItem.url))
             Toast.makeText(this, R.string.link_copied_to_clipboard, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private var sleepJob: Job? = null
+
+    private fun setupSleepTimer() {
+        findViewById<MaterialButton>(R.id.watch_sleep_timer).setOnClickListener {
+            val minutes = intArrayOf(0, 15, 30, 60)
+            val labels = arrayOf(
+                getString(R.string.watch_sleep_off),
+                getString(R.string.watch_sleep_minutes, 15),
+                getString(R.string.watch_sleep_minutes, 30),
+                getString(R.string.watch_sleep_minutes, 60)
+            )
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.watch_sleep_timer)
+                .setItems(labels) { _, which -> setSleepTimer(minutes[which]) }
+                .show()
+        }
+    }
+
+    private fun setSleepTimer(minutes: Int) {
+        sleepJob?.cancel()
+        sleepJob = null
+        if (minutes <= 0) {
+            Toast.makeText(this, R.string.watch_sleep_cancelled, Toast.LENGTH_SHORT).show()
+            return
+        }
+        Toast.makeText(this, getString(R.string.watch_sleep_set, minutes), Toast.LENGTH_SHORT).show()
+        sleepJob = lifecycleScope.launch {
+            kotlinx.coroutines.delay(minutes * 60_000L)
+            if (::player.isInitialized) player.pause()
+            sleepJob = null
         }
     }
 }
