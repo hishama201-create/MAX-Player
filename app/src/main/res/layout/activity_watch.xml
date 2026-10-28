@@ -198,6 +198,15 @@
         android:layout_marginTop="8dp"
         android:text="@string/lyrics"
         app:icon="@drawable/ic_lyrics" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/watch_cc"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/subtitles"
+        android:visibility="gone" />
 
     <HorizontalScrollView
         android:id="@+id/watch_chapters_scroll"

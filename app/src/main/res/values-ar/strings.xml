@@ -664,6 +664,7 @@
     <string name="watch_history">شاهدتها مؤخراً</string>
     <string name="watch_quality">جودة الفيديو</string>
     <string name="watch_quality_p">%dp</string>
+    <string name="watch_cc_off">بدون ترجمة</string>
     <string name="watch_fav_added">أُضيف إلى المفضلة</string>
     <string name="watch_fav_removed">أُزيل من المفضلة</string>
     <string name="watch_loading_list">جارٍ التحميل…</string>

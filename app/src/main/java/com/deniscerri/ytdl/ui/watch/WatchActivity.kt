@@ -76,6 +76,8 @@ class WatchActivity : BaseActivity() {
     private var relatedLoading = false
     private var lastListEmpty = false
     private var selectedHeight = 720
+    private var subOptions: List<com.deniscerri.ytdl.util.extractors.newpipe.WatchSub> = emptyList()
+    private var selectedSub = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +118,20 @@ class WatchActivity : BaseActivity() {
         setupShareButtons()
         setupSleepTimer()
         findViewById<MaterialButton>(R.id.watch_lyrics).setOnClickListener { WatchLyricsSheet(this, player, currentItem.title.toString(), currentItem.author.toString()).show() }
+        findViewById<MaterialButton>(R.id.watch_cc).setOnClickListener {
+            val labels = (listOf(getString(R.string.watch_cc_off)) + subOptions.map { it.label }).toTypedArray()
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.subtitles)
+                .setSingleChoiceItems(labels, selectedSub + 1) { d, which ->
+                    d.dismiss()
+                    if (which - 1 != selectedSub) {
+                        selectedSub = which - 1
+                        savePosition()
+                        startPlayback(currentItem)
+                    }
+                }
+                .show()
+        }
         findViewById<MaterialButton>(R.id.watch_quality).setOnClickListener {
             val heights = intArrayOf(360, 480, 720, 1080)
             val labels = heights.map { getString(R.string.watch_quality_p, it) }.toTypedArray()
@@ -250,6 +266,8 @@ class WatchActivity : BaseActivity() {
         findViewById<TextView>(R.id.watch_title).text = item.title
         findViewById<TextView>(R.id.watch_author).text = item.author
         channelResults = emptyList()
+        subOptions = emptyList()
+        selectedSub = -1
         updateMetaRow("", "")
         similarResults = emptyList()
         showSuggestions()
@@ -291,6 +309,8 @@ class WatchActivity : BaseActivity() {
                     if (m.views >= 0) parts.add(getString(R.string.watch_views, java.text.NumberFormat.getInstance().format(m.views)))
                     if (m.dateMillis > 0) parts.add(java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(m.dateMillis)))
                     updateMetaRow(parts.joinToString(getString(R.string.watch_meta_sep)), m.description)
+                    subOptions = m.subtitles
+                    updateMetaRow()
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -347,10 +367,10 @@ class WatchActivity : BaseActivity() {
                     val audioSource: MediaSource =
                         factory.createMediaSource(MediaItem.fromUri(Uri.parse(urls[0])))
                     val videoSource: MediaSource =
-                        factory.createMediaSource(MediaItem.fromUri(Uri.parse(urls[1])))
+                        factory.createMediaSource(withSub(urls[1]))
                     player.setMediaSource(MergingMediaSource(videoSource, audioSource))
                 } else {
-                    player.setMediaItem(MediaItem.fromUri(Uri.parse(urls[0])))
+                    player.setMediaItem(withSub(urls[0]))
                 }
                 restorePosition(item)
                 player.prepare()
@@ -567,6 +587,21 @@ class WatchActivity : BaseActivity() {
         val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
         meta.isVisible = meta.text.isNotEmpty() && chipsShown
         description.isVisible = description.text.isNotEmpty() && chipsShown
+        findViewById<View>(R.id.watch_cc).isVisible = subOptions.isNotEmpty() && chipsShown
+    }
+
+    private fun withSub(url: String): MediaItem {
+        val b = MediaItem.Builder().setUri(Uri.parse(url))
+        subOptions.getOrNull(selectedSub)?.let { s ->
+            b.setSubtitleConfigurations(listOf(
+                MediaItem.SubtitleConfiguration.Builder(Uri.parse(s.url))
+                    .setMimeType(s.mime)
+                    .setLabel(s.label)
+                    .setSelectionFlags(androidx.media3.common.C.SELECTION_FLAG_DEFAULT)
+                    .build()
+            ))
+        }
+        return b.build()
     }
 
     private fun setupShareButtons() {
