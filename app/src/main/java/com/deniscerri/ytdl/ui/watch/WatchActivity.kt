@@ -361,6 +361,7 @@ class WatchActivity : BaseActivity() {
                 val urls = data.first
                 showChapters(data.second ?: emptyList())
                 if (urls.isEmpty()) throw Exception("No Data found!")
+                kotlinx.coroutines.withTimeoutOrNull(3000) { relatedJob?.join() }
 
                 if (urls.size == 2) {
                     val factory = DefaultMediaSourceFactory(this@WatchActivity)
@@ -587,19 +588,17 @@ class WatchActivity : BaseActivity() {
         val chipsShown = findViewById<View>(R.id.watch_chips_scroll).isVisible
         meta.isVisible = meta.text.isNotEmpty() && chipsShown
         description.isVisible = description.text.isNotEmpty() && chipsShown
-        findViewById<View>(R.id.watch_cc).isVisible = subOptions.isNotEmpty() && chipsShown
     }
 
     private fun withSub(url: String): MediaItem {
         val b = MediaItem.Builder().setUri(Uri.parse(url))
-        subOptions.getOrNull(selectedSub)?.let { s ->
-            b.setSubtitleConfigurations(listOf(
+        if (subOptions.isNotEmpty()) {
+            b.setSubtitleConfigurations(subOptions.map { s ->
                 MediaItem.SubtitleConfiguration.Builder(Uri.parse(s.url))
                     .setMimeType(s.mime)
                     .setLabel(s.label)
-                    .setSelectionFlags(androidx.media3.common.C.SELECTION_FLAG_DEFAULT)
                     .build()
-            ))
+            })
         }
         return b.build()
     }
