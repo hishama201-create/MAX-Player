@@ -115,6 +115,7 @@ class WatchActivity : BaseActivity() {
         setupFavoriteButton()
         setupShareButtons()
         setupSleepTimer()
+        findViewById<MaterialButton>(R.id.watch_lyrics).setOnClickListener { WatchLyricsSheet(this, player, currentItem.title.toString(), currentItem.author.toString()).show() }
         findViewById<MaterialButton>(R.id.watch_quality).setOnClickListener {
             val heights = intArrayOf(360, 480, 720, 1080)
             val labels = heights.map { getString(R.string.watch_quality_p, it) }.toTypedArray()
@@ -419,6 +420,7 @@ class WatchActivity : BaseActivity() {
             R.id.watch_title,
             R.id.watch_author,
             R.id.watch_actions,
+            R.id.watch_lyrics,
             R.id.watch_chips_scroll,
             R.id.watch_suggestions
         )
@@ -480,6 +482,7 @@ class WatchActivity : BaseActivity() {
             R.id.watch_title,
             R.id.watch_author,
             R.id.watch_actions,
+            R.id.watch_lyrics,
             R.id.watch_chips_scroll,
             R.id.watch_suggestions
         ).forEach { findViewById<View>(it).isVisible = !fullscreen }
