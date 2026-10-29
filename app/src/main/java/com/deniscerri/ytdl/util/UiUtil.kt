@@ -1113,11 +1113,6 @@ object UiUtil {
             context.getString(R.string.cancel)
         ) { _: DialogInterface?, _: Int -> }
 
-        builder.setNeutralButton("?")  { _: DialogInterface?, _: Int ->
-            val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/yt-dlp/yt-dlp#subtitle-options"))
-            context.startActivity(browserIntent)
-        }
 
         val dialog = builder.create()
         dialog.show()
