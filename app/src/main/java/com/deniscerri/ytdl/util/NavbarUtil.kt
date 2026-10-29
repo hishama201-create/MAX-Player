@@ -81,7 +81,7 @@ object NavbarUtil {
 
     private fun getNavBarPrefs(): List<String> {
         return settings
-            .getString("navigation_bar", "0,1,2,-3")!!
+            .getString("navigation_bar", "0,1,2,3")!!
             .split(",")
     }
 
