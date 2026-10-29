@@ -676,4 +676,16 @@
     <string name="watch_sleep_cancelled">أُلغي مؤقت النوم</string>
     <string name="watch_views">%1$s مشاهدة</string>
     <string name="watch_meta_sep"> • </string>
+    <string name="lyrics">الكلمات</string>
+    <string name="embed_lyrics">تضمين الكلمات</string>
+    <string name="save_lrc_file">حفظ ملف lrc</string>
+    <string name="lyrics_offset">الإزاحة</string>
+    <string name="lyrics_not_found">لم يتم العثور على كلمات</string>
+    <string name="lyrics_unsynced">الكلمات غير متزامنة، لا يوجد توقيت لضبطه</string>
+    <string name="lyrics_source">الكلمات من lrclib.net</string>
+    <string name="lyrics_no_preview">المعاينة غير متاحة، وستُضاف الكلمات عند التنزيل</string>
+    <string name="lyrics_synced">متزامنة</string>
+    <string name="lyrics_plain">نص عادي</string>
+    <string name="embed_lyrics_summary">جلب الكلمات من lrclib.net وتضمينها في التنزيلات الصوتية</string>
+    <string name="save_lrc_file_summary">حفظ الكلمات المتزامنة كملف lrc بجانب التنزيلات الصوتية</string>
 </resources>
