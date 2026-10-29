@@ -123,6 +123,16 @@
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_quick_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground"
+            android:clipToPadding="false"
+            android:paddingBottom="200dp"
+            android:scrollbars="none"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </RelativeLayout>
 
     <com.google.android.material.appbar.AppBarLayout
@@ -219,6 +229,27 @@
 
         </HorizontalScrollView>
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/home_quick_chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:selectionRequired="false"
+            app:singleSelection="true">
+            <com.google.android.material.chip.Chip
+                android:id="@+id/home_chip_favorites"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_favorites" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/home_chip_history"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_history" />
+        </com.google.android.material.chip.ChipGroup>
     </com.google.android.material.appbar.AppBarLayout>
 
 

@@ -209,6 +209,23 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         searchSuggestionsRecyclerView?.isNestedScrollingEnabled = false
 
         val progressBar = view.findViewById<View>(R.id.progress)
+        val homeQuickList = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.home_quick_list)
+        val homeQuickAdapter = com.deniscerri.ytdl.ui.watch.WatchSuggestionsAdapter { item -> onCardDetailsClick(item) }
+        homeQuickList.layoutManager = LinearLayoutManager(context)
+        homeQuickList.adapter = homeQuickAdapter
+        val homeChipFav = view.findViewById<Chip>(R.id.home_chip_favorites)
+        val homeChipHistory = view.findViewById<Chip>(R.id.home_chip_history)
+        val refreshHomeQuickList = {
+            val quickItems = when {
+                homeChipFav.isChecked -> com.deniscerri.ytdl.ui.watch.FavoritesStore.getAll(requireContext())
+                homeChipHistory.isChecked -> com.deniscerri.ytdl.ui.watch.HistoryStore.getAll(requireContext())
+                else -> null
+            }
+            homeQuickAdapter.submitList(quickItems ?: emptyList())
+            homeQuickList.isVisible = quickItems != null
+        }
+        homeChipFav.setOnCheckedChangeListener { _, _ -> refreshHomeQuickList() }
+        homeChipHistory.setOnCheckedChangeListener { _, _ -> refreshHomeQuickList() }
 
         resultViewModel = ViewModelProvider(requireActivity())[ResultViewModel::class.java]
 
@@ -725,6 +742,8 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         }
 
         searchView.hide()
+        view?.findViewById<Chip>(R.id.home_chip_favorites)?.isChecked = false
+        view?.findViewById<Chip>(R.id.home_chip_history)?.isChecked = false
         if(!sharedPreferences!!.getBoolean("incognito", false)){
             queryList.forEach { q ->
                 resultViewModel.addSearchQueryToHistory(q)
