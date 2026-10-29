@@ -60,7 +60,7 @@
 
         <SwitchPreferenceCompat
             android:widgetLayout="@layout/preferece_material_switch"
-            app:defaultValue="false"
+            app:defaultValue="true"
             android:icon="@drawable/ic_ipv4"
             android:key="force_ipv4"
             app:summary="@string/force_ipv4_desc"
@@ -143,7 +143,7 @@
 
         <SwitchPreferenceCompat
             android:widgetLayout="@layout/preferece_material_switch"
-            app:defaultValue="false"
+            app:defaultValue="true"
             android:icon="@drawable/ic_speed"
             android:key="aria2"
             app:summary="@string/aria2_summary"

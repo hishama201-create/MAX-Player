@@ -74,7 +74,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
         val socketTimeout = sharedPreferences.getString("socket_timeout", "5")!!.ifEmpty { "5" }
         addOption("--socket-timeout", socketTimeout)
 
-        if (sharedPreferences.getBoolean("force_ipv4", false)){
+        if (sharedPreferences.getBoolean("force_ipv4", true)){
             addOption("-4")
         }
 
@@ -1011,7 +1011,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
             }
         }
 
-        val aria2 = sharedPreferences.getBoolean("aria2", false)
+        val aria2 = sharedPreferences.getBoolean("aria2", true)
         if (aria2) {
             ytDlRequest.addOption("--downloader", "libaria2c.so")
             //request.addOption("--external-downloader-args", "aria2c:\"--summary-interval=1\"")
@@ -1043,7 +1043,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
         }
 
         if (sharedPreferences.getBoolean("restrict_filenames", true)) request.addOption("--restrict-filenames")
-        if (sharedPreferences.getBoolean("force_ipv4", false)){
+        if (sharedPreferences.getBoolean("force_ipv4", true)){
             request.addOption("-4")
         }
         if (sharedPreferences.getBoolean("use_cookies", false)){
