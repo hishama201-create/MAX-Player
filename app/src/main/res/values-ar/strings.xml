@@ -691,4 +691,7 @@
     <string name="library">المكتبة</string>
     <string name="music">الموسيقى</string>
     <string name="library_placeholder">قريباً</string>
+    <string name="library_permission_needed">اسمح بالوصول إلى الفيديوهات لعرضها هنا</string>
+    <string name="library_grant">السماح بالوصول</string>
+    <string name="library_no_videos">لا توجد فيديوهات على هذا الجهاز</string>
 </resources>

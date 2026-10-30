@@ -704,4 +704,7 @@
     <string name="library">Library</string>
     <string name="music">Music</string>
     <string name="library_placeholder">Coming soon</string>
+    <string name="library_permission_needed">Allow access to your videos to show them here</string>
+    <string name="library_grant">Allow access</string>
+    <string name="library_no_videos">No videos found on this device</string>
 </resources>
