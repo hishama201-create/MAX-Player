@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +27,8 @@ class LibraryFragment : Fragment() {
     private lateinit var grant: Button
     private lateinit var videoAdapter: LibraryVideoAdapter
     private lateinit var musicAdapter: LibraryMusicAdapter
+    private var currentVideos: List<LocalVideo> = emptyList()
+    private var currentSongs: List<LocalSong> = emptyList()
 
     private fun permissionFor(tab: Int): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -50,10 +51,10 @@ class LibraryFragment : Fragment() {
         placeholder = view.findViewById(R.id.library_placeholder)
         grant = view.findViewById(R.id.library_grant)
         videoAdapter = LibraryVideoAdapter(viewLifecycleOwner.lifecycleScope) { video ->
-            Toast.makeText(requireContext(), video.title, Toast.LENGTH_SHORT).show()
+            val idx = currentVideos.indexOf(video); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentVideos.map { it.id }.toLongArray(), currentVideos.map { it.title }.toTypedArray(), idx, false)
         }
         musicAdapter = LibraryMusicAdapter(viewLifecycleOwner.lifecycleScope) { song ->
-            Toast.makeText(requireContext(), song.title, Toast.LENGTH_SHORT).show()
+            val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true)
         }
         list.layoutManager = LinearLayoutManager(requireContext())
         grant.setOnClickListener { permissionLauncher.launch(permissionFor(tabs.selectedTabPosition)) }
@@ -91,7 +92,7 @@ class LibraryFragment : Fragment() {
             } else {
                 list.adapter = videoAdapter
                 showList()
-                videoAdapter.submitList(videos)
+                currentVideos = videos; videoAdapter.submitList(videos)
             }
         }
     }
@@ -106,7 +107,7 @@ class LibraryFragment : Fragment() {
             } else {
                 list.adapter = musicAdapter
                 showList()
-                musicAdapter.submitList(songs)
+                currentSongs = songs; musicAdapter.submitList(songs)
             }
         }
     }
