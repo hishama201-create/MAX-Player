@@ -85,6 +85,11 @@
         android:label="activity_terminal"
         tools:layout="@layout/fragment_terminal" />
     <fragment
+        android:id="@+id/libraryFragment"
+        android:name="com.deniscerri.ytdl.ui.library.LibraryFragment"
+        android:label="@string/library"
+        tools:layout="@layout/fragment_library" />
+    <fragment
         android:id="@+id/cookiesFragment"
         android:name="com.deniscerri.ytdl.ui.more.cookies.CookiesFragment"
         tools:layout="@layout/fragment_cookies"

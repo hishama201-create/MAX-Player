@@ -17,4 +17,7 @@
         android:icon="@drawable/baseline_downloading_24"
         android:visible="true"
         android:id="@+id/downloadQueueMainFragment"/>
+    <item android:title="@string/library"
+        android:icon="@drawable/ic_library"
+        android:id="@+id/libraryFragment"/>
 </menu>

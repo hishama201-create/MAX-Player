@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_downloads"
         android:checkable="true"
         android:id="@+id/historyFragment"/>
+    <item android:title="@string/library"
+        android:icon="@drawable/ic_library"
+        android:checkable="true"
+        android:id="@+id/libraryFragment"/>
     <item android:title="@string/logs"
         android:icon="@drawable/ic_baseline_file_open_24"
         android:checkable="true"

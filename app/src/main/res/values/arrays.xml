@@ -289,6 +289,7 @@
         <item>@string/downloads</item>
         <item>@string/download_queue</item>
         <item>@string/more</item>
+        <item>@string/library</item>
     </array>
 
     <array name="start_destination_values">
@@ -296,6 +297,7 @@
         <item>History</item>
         <item>Queue</item>
         <item>More</item>
+        <item>Library</item>
     </array>
 
     <array name="themes">

@@ -688,4 +688,7 @@
     <string name="lyrics_plain">نص عادي</string>
     <string name="embed_lyrics_summary">جلب الكلمات من lrclib.net وتضمينها في التنزيلات الصوتية</string>
     <string name="save_lrc_file_summary">حفظ الكلمات المتزامنة كملف lrc بجانب التنزيلات الصوتية</string>
+    <string name="library">المكتبة</string>
+    <string name="music">الموسيقى</string>
+    <string name="library_placeholder">قريباً</string>
 </resources>

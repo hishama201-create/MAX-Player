@@ -27,7 +27,8 @@ object NavbarUtil {
         "History" to R.id.historyFragment,
         "Queue" to R.id.downloadQueueMainFragment,
         "Terminal" to R.id.terminalActivity,
-        "More" to R.id.moreFragment
+        "More" to R.id.moreFragment,
+        "Library" to R.id.libraryFragment
     )
 
     fun getStartFragmentId(context: Context) : Int {
@@ -81,7 +82,7 @@ object NavbarUtil {
 
     private fun getNavBarPrefs(): List<String> {
         return settings
-            .getString("navigation_bar", "0,1,2,3")!!
+            .getString("navigation_bar", "0,1,2,3,4")!!
             .split(",")
     }
 
