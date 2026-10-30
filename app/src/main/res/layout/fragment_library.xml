@@ -25,6 +25,11 @@
             android:id="@+id/library_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fastScrollEnabled="true"
+            android:fastScrollHorizontalThumbDrawable="@drawable/library_fastscroll_thumb"
+            android:fastScrollHorizontalTrackDrawable="@drawable/library_fastscroll_track"
+            android:fastScrollVerticalThumbDrawable="@drawable/library_fastscroll_thumb"
+            android:fastScrollVerticalTrackDrawable="@drawable/library_fastscroll_track"
             android:visibility="gone" />
         <LinearLayout
             android:layout_width="match_parent"
