@@ -26,13 +26,17 @@ class LibraryFragment : Fragment() {
     private lateinit var list: RecyclerView
     private lateinit var placeholder: TextView
     private lateinit var grant: Button
-    private lateinit var adapter: LibraryVideoAdapter
+    private lateinit var videoAdapter: LibraryVideoAdapter
+    private lateinit var musicAdapter: LibraryMusicAdapter
 
-    private val permission = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_VIDEO else Manifest.permission.READ_EXTERNAL_STORAGE
+    private fun permissionFor(tab: Int): String {
+        if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
+        return if (tab == 0) Manifest.permission.READ_MEDIA_VIDEO else Manifest.permission.READ_MEDIA_AUDIO
+    }
 
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
         if (view == null) return@registerForActivityResult
-        if (granted) loadVideos() else showMessage(getString(R.string.library_permission_needed), true)
+        refresh()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,12 +49,14 @@ class LibraryFragment : Fragment() {
         list = view.findViewById(R.id.library_list)
         placeholder = view.findViewById(R.id.library_placeholder)
         grant = view.findViewById(R.id.library_grant)
-        adapter = LibraryVideoAdapter(viewLifecycleOwner.lifecycleScope) { video ->
+        videoAdapter = LibraryVideoAdapter(viewLifecycleOwner.lifecycleScope) { video ->
             Toast.makeText(requireContext(), video.title, Toast.LENGTH_SHORT).show()
         }
+        musicAdapter = LibraryMusicAdapter(viewLifecycleOwner.lifecycleScope) { song ->
+            Toast.makeText(requireContext(), song.title, Toast.LENGTH_SHORT).show()
+        }
         list.layoutManager = LinearLayoutManager(requireContext())
-        list.adapter = adapter
-        grant.setOnClickListener { permissionLauncher.launch(permission) }
+        grant.setOnClickListener { permissionLauncher.launch(permissionFor(tabs.selectedTabPosition)) }
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) { refresh() }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -59,18 +65,19 @@ class LibraryFragment : Fragment() {
         refresh()
     }
 
-    private fun hasPermission(): Boolean {
+    private fun hasPermission(tab: Int): Boolean {
         if (Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()) return true
-        return ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(requireContext(), permissionFor(tab)) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun refresh() {
-        if (tabs.selectedTabPosition != 0) {
-            showMessage(getString(R.string.library_placeholder), false)
-        } else if (hasPermission()) {
+        val tab = tabs.selectedTabPosition
+        if (!hasPermission(tab)) {
+            showMessage(getString(if (tab == 0) R.string.library_permission_needed else R.string.library_permission_needed_music), true)
+        } else if (tab == 0) {
             loadVideos()
         } else {
-            showMessage(getString(R.string.library_permission_needed), true)
+            loadSongs()
         }
     }
 
@@ -82,11 +89,31 @@ class LibraryFragment : Fragment() {
             if (videos.isEmpty()) {
                 showMessage(getString(R.string.library_no_videos), false)
             } else {
-                (placeholder.parent as View).visibility = View.GONE
-                list.visibility = View.VISIBLE
-                adapter.submitList(videos)
+                list.adapter = videoAdapter
+                showList()
+                videoAdapter.submitList(videos)
             }
         }
+    }
+
+    private fun loadSongs() {
+        val ctx = requireContext()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val songs = LocalMusicRepository.loadSongs(ctx)
+            if (tabs.selectedTabPosition != 1) return@launch
+            if (songs.isEmpty()) {
+                showMessage(getString(R.string.library_no_music), false)
+            } else {
+                list.adapter = musicAdapter
+                showList()
+                musicAdapter.submitList(songs)
+            }
+        }
+    }
+
+    private fun showList() {
+        (placeholder.parent as View).visibility = View.GONE
+        list.visibility = View.VISIBLE
     }
 
     private fun showMessage(text: String, showGrant: Boolean) {

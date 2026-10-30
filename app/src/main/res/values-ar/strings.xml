@@ -694,4 +694,6 @@
     <string name="library_permission_needed">اسمح بالوصول إلى الفيديوهات لعرضها هنا</string>
     <string name="library_grant">السماح بالوصول</string>
     <string name="library_no_videos">لا توجد فيديوهات على هذا الجهاز</string>
+    <string name="library_permission_needed_music">اسمح بالوصول إلى الموسيقى لعرضها هنا</string>
+    <string name="library_no_music">لا توجد موسيقى على هذا الجهاز</string>
 </resources>
