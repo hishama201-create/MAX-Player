@@ -39,6 +39,7 @@ class LocalPlayerActivity : AppCompatActivity() {
                 .setMediaMetadata(MediaMetadata.Builder().setTitle(titles[i]).build())
                 .build()
         }
+        if (WatchPlaybackService.detached) { val old = WatchPlaybackService.player; WatchPlaybackService.detached = false; WatchPlaybackService.player = null; stopService(Intent(this, WatchPlaybackService::class.java)); old?.release() }
         player = VideoPlayerUtil.buildPlayer(this)
         player.setWakeMode(androidx.media3.common.C.WAKE_MODE_LOCAL)
         player.setMediaItems(items, start.coerceIn(0, items.size - 1), 0L)
@@ -57,6 +58,7 @@ class LocalPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (::player.isInitialized) {
+            if (isFinishing && player.isPlaying && WatchPlaybackService.player === player) { WatchPlaybackService.detached = true; return }
             if (WatchPlaybackService.player === player) {
                 WatchPlaybackService.player = null
                 stopService(Intent(this, WatchPlaybackService::class.java))

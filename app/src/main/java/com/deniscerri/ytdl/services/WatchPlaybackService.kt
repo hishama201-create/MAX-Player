@@ -72,6 +72,7 @@ class WatchPlaybackService : Service() {
 
     override fun onDestroy() {
         manager?.setPlayer(null)
+        if (detached) { player?.release(); player = null; detached = false }
         manager = null
         super.onDestroy()
     }
@@ -80,7 +81,9 @@ class WatchPlaybackService : Service() {
         private const val CHANNEL_ID = "watch_playback"
         private const val NOTIFICATION_ID = 7421
         @Volatile var player: Player? = null
+            set(value) { if (detached && field != null && field !== value) { field?.release(); detached = false }; field = value }
         @Volatile var title: String = ""
         @Volatile var author: String = ""
+        @Volatile var detached: Boolean = false
     }
 }
