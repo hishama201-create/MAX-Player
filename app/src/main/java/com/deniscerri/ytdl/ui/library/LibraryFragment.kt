@@ -29,6 +29,7 @@ class LibraryFragment : Fragment() {
     private lateinit var musicAdapter: LibraryMusicAdapter
     private var currentVideos: List<LocalVideo> = emptyList()
     private var currentSongs: List<LocalSong> = emptyList()
+    private var lastGranted = false
 
     private fun permissionFor(tab: Int): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -66,6 +67,11 @@ class LibraryFragment : Fragment() {
         refresh()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::tabs.isInitialized && hasPermission(tabs.selectedTabPosition) != lastGranted) refresh()
+    }
+
     private fun hasPermission(tab: Int): Boolean {
         if (Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()) return true
         return ContextCompat.checkSelfPermission(requireContext(), permissionFor(tab)) == PackageManager.PERMISSION_GRANTED
@@ -73,6 +79,7 @@ class LibraryFragment : Fragment() {
 
     private fun refresh() {
         val tab = tabs.selectedTabPosition
+        lastGranted = hasPermission(tab)
         if (!hasPermission(tab)) {
             showMessage(getString(if (tab == 0) R.string.library_permission_needed else R.string.library_permission_needed_music), true)
         } else if (tab == 0) {
