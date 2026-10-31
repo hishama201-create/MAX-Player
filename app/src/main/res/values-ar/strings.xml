@@ -696,4 +696,7 @@
     <string name="library_no_videos">لا توجد فيديوهات على هذا الجهاز</string>
     <string name="library_permission_needed_music">اسمح بالوصول إلى الموسيقى لعرضها هنا</string>
     <string name="library_no_music">لا توجد موسيقى على هذا الجهاز</string>
+    <string name="resize_fit">ملاءمة</string>
+    <string name="resize_zoom">تكبير</string>
+    <string name="resize_fill">تمديد</string>
 </resources>

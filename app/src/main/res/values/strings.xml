@@ -709,4 +709,7 @@
     <string name="library_no_videos">No videos found on this device</string>
     <string name="library_permission_needed_music">Allow access to your music to show it here</string>
     <string name="library_no_music">No music found on this device</string>
+    <string name="resize_fit">Fit</string>
+    <string name="resize_zoom">Zoom</string>
+    <string name="resize_fill">Stretch</string>
 </resources>

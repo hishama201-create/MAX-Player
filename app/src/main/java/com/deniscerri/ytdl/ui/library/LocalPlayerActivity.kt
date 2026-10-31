@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.deniscerri.ytdl.R
 import com.deniscerri.ytdl.services.WatchPlaybackService
@@ -82,13 +83,34 @@ class LocalPlayerActivity : AppCompatActivity() {
         var startBright = 0.5f
         var startVol = 0
         var maxVol = 1
+        var pinchDone = false
+        val modes = intArrayOf(AspectRatioFrameLayout.RESIZE_MODE_FIT, AspectRatioFrameLayout.RESIZE_MODE_ZOOM, AspectRatioFrameLayout.RESIZE_MODE_FILL)
+        val modeNames = intArrayOf(R.string.resize_fit, R.string.resize_zoom, R.string.resize_fill)
+        val pinch = android.view.ScaleGestureDetector(this, object : android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: android.view.ScaleGestureDetector): Boolean {
+                if (pinchDone) return true
+                val cur = modes.indexOf(view.resizeMode).coerceAtLeast(0)
+                val next = if (detector.scaleFactor > 1.1f) (cur + 1).coerceAtMost(2) else if (detector.scaleFactor < 0.9f) (cur - 1).coerceAtLeast(0) else cur
+                if (next != cur) {
+                    view.resizeMode = modes[next]
+                    overlay.text = getString(modeNames[next])
+                    overlay.visibility = android.view.View.VISIBLE
+                    val shown = overlay.text.toString()
+                    overlay.postDelayed({ if (overlay.text.toString() == shown) overlay.visibility = android.view.View.GONE }, 1000)
+                    pinchDone = true
+                }
+                return true
+            }
+            override fun onScaleEnd(detector: android.view.ScaleGestureDetector) { pinchDone = false }
+        })
         view.setOnTouchListener { _, e ->
+            pinch.onTouchEvent(e)
             when (e.actionMasked) {
                 android.view.MotionEvent.ACTION_DOWN -> { downX = e.x; downY = e.y; mode = 0 }
                 android.view.MotionEvent.ACTION_MOVE -> {
                     val dx = e.x - downX
                     val dy = e.y - downY
-                    if (mode == 0) {
+                    if (mode == 0 && e.pointerCount == 1 && !pinch.isInProgress) {
                         if (kotlin.math.abs(dx) > 24 * dp && kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2) {
                             mode = 1
                             startPos = player.currentPosition
