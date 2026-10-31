@@ -20,6 +20,8 @@ import com.deniscerri.ytdl.util.VideoPlayerUtil
 
 class LocalPlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
+    private var itemIds: LongArray = LongArray(0)
+    private var itemsAreAudio = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,8 @@ class LocalPlayerActivity : AppCompatActivity() {
             finish()
             return
         }
+        itemIds = ids
+        itemsAreAudio = isAudio
         val base = if (isAudio) MediaStore.Audio.Media.EXTERNAL_CONTENT_URI else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val items = ids.indices.map { i ->
             MediaItem.Builder()
@@ -43,6 +47,7 @@ class LocalPlayerActivity : AppCompatActivity() {
         player = VideoPlayerUtil.buildPlayer(this)
         player.setWakeMode(androidx.media3.common.C.WAKE_MODE_LOCAL)
         player.setMediaItems(items, start.coerceIn(0, items.size - 1), 0L)
+        restorePosition(start.coerceIn(0, items.size - 1))
         player.prepare()
         player.playWhenReady = true
         WatchPlaybackService.player = player
@@ -133,6 +138,30 @@ class LocalPlayerActivity : AppCompatActivity() {
             }
             mode != 0
         }
+    }
+
+    private fun savePosition() {
+        if (!::player.isInitialized || itemsAreAudio || itemIds.isEmpty()) return
+        if (player.playbackState == androidx.media3.common.Player.STATE_IDLE) return
+        val dur = player.duration
+        if (dur == androidx.media3.common.C.TIME_UNSET) return
+        val idx = player.currentMediaItemIndex
+        if (idx !in itemIds.indices) return
+        val pos = player.currentPosition
+        val edit = getSharedPreferences("watch_positions", MODE_PRIVATE).edit()
+        if (pos < 10000 || dur - pos < 10000) edit.remove("v_" + itemIds[idx]) else edit.putLong("v_" + itemIds[idx], pos)
+        edit.apply()
+    }
+
+    private fun restorePosition(idx: Int) {
+        if (itemsAreAudio || idx !in itemIds.indices) return
+        val pos = getSharedPreferences("watch_positions", MODE_PRIVATE).getLong("v_" + itemIds[idx], 0L)
+        if (pos > 0L) player.seekTo(idx, pos)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        savePosition()
     }
 
     override fun onDestroy() {
