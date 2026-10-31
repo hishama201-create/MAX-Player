@@ -68,41 +68,70 @@ class LocalPlayerActivity : AppCompatActivity() {
     @android.annotation.SuppressLint("ClickableViewAccessibility")
     private fun setupSeekGesture(view: PlayerView, overlay: android.widget.TextView) {
         val dp = resources.displayMetrics.density
+        val audio = getSystemService(android.content.Context.AUDIO_SERVICE) as android.media.AudioManager
         var downX = 0f
         var downY = 0f
-        var seeking = false
+        var mode = 0
         var startPos = 0L
         var target = 0L
+        var startBright = 0.5f
+        var startVol = 0
+        var maxVol = 1
         view.setOnTouchListener { _, e ->
             when (e.actionMasked) {
-                android.view.MotionEvent.ACTION_DOWN -> { downX = e.x; downY = e.y; seeking = false }
+                android.view.MotionEvent.ACTION_DOWN -> { downX = e.x; downY = e.y; mode = 0 }
                 android.view.MotionEvent.ACTION_MOVE -> {
                     val dx = e.x - downX
                     val dy = e.y - downY
-                    if (!seeking && kotlin.math.abs(dx) > 24 * dp && kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2) {
-                        seeking = true
-                        startPos = player.currentPosition
-                        view.hideController()
+                    if (mode == 0) {
+                        if (kotlin.math.abs(dx) > 24 * dp && kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2) {
+                            mode = 1
+                            startPos = player.currentPosition
+                            view.hideController()
+                        } else if (kotlin.math.abs(dy) > 24 * dp && kotlin.math.abs(dy) > kotlin.math.abs(dx) * 2) {
+                            view.hideController()
+                            if (downX < view.width / 2f) {
+                                mode = 2
+                                val cur = window.attributes.screenBrightness
+                                startBright = if (cur < 0f) android.provider.Settings.System.getInt(contentResolver, android.provider.Settings.System.SCREEN_BRIGHTNESS, 128) / 255f else cur
+                            } else {
+                                mode = 3
+                                maxVol = audio.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC).coerceAtLeast(1)
+                                startVol = audio.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                            }
+                        }
                     }
-                    if (seeking) {
+                    if (mode == 1) {
                         val dur = player.duration
                         val t = startPos + (dx / dp * 150).toLong()
                         target = if (dur > 0) t.coerceIn(0L, dur) else t.coerceAtLeast(0L)
                         val diff = target - startPos
                         overlay.text = fmtTime(target) + "\n[" + (if (diff >= 0) "+" else "-") + fmtTime(kotlin.math.abs(diff)) + "]"
                         overlay.visibility = android.view.View.VISIBLE
+                    } else if (mode == 2) {
+                        val v = (startBright - dy / view.height * 1.2f).coerceIn(0.01f, 1f)
+                        val lp = window.attributes
+                        lp.screenBrightness = v
+                        window.attributes = lp
+                        overlay.text = "\u2600 " + (v * 100).toInt() + "%"
+                        overlay.visibility = android.view.View.VISIBLE
+                    } else if (mode == 3) {
+                        val v = (startVol + (-dy / view.height * 1.2f) * maxVol).toInt().coerceIn(0, maxVol)
+                        audio.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, v, 0)
+                        overlay.text = "\uD83D\uDD0A " + (v * 100 / maxVol) + "%"
+                        overlay.visibility = android.view.View.VISIBLE
                     }
                 }
                 android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
-                    if (seeking) {
-                        if (e.actionMasked == android.view.MotionEvent.ACTION_UP) player.seekTo(target)
+                    if (mode != 0) {
+                        if (mode == 1 && e.actionMasked == android.view.MotionEvent.ACTION_UP) player.seekTo(target)
                         overlay.visibility = android.view.View.GONE
-                        seeking = false
+                        mode = 0
                         return@setOnTouchListener true
                     }
                 }
             }
-            seeking
+            mode != 0
         }
     }
 
