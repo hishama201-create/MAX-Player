@@ -699,4 +699,8 @@
     <string name="resize_fit">ملاءمة</string>
     <string name="resize_zoom">تكبير</string>
     <string name="resize_fill">تمديد</string>
+    <string name="player_speed">سرعة التشغيل</string>
+    <string name="player_lock">قفل الشاشة</string>
+    <string name="player_unlock">فتح القفل</string>
+    <string name="player_locked_hint">الشاشة مقفلة</string>
 </resources>

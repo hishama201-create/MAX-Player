@@ -712,4 +712,8 @@
     <string name="resize_fit">Fit</string>
     <string name="resize_zoom">Zoom</string>
     <string name="resize_fill">Stretch</string>
+    <string name="player_speed">Playback speed</string>
+    <string name="player_lock">Lock controls</string>
+    <string name="player_unlock">Unlock</string>
+    <string name="player_locked_hint">Screen locked</string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -23,6 +24,7 @@ class LocalPlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
     private var itemIds: LongArray = LongArray(0)
     private var itemsAreAudio = false
+    private var locked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +59,38 @@ class LocalPlayerActivity : AppCompatActivity() {
         ContextCompat.startForegroundService(this, Intent(this, WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.local_player).player = player
         setupSeekGesture(findViewById(R.id.local_player), findViewById(R.id.seek_overlay))
+        val speedLabels = arrayOf("0.5x", "0.75x", "1x", "1.25x", "1.5x", "2x")
+        val speedValues = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
+        val pv = findViewById<PlayerView>(R.id.local_player)
+        val bSpeed = findViewById<android.view.View>(R.id.btn_speed)
+        val bLock = findViewById<android.view.View>(R.id.btn_lock)
+        val bUnlock = findViewById<android.view.View>(R.id.btn_unlock)
+        val hint = findViewById<android.widget.TextView>(R.id.seek_overlay)
+        bSpeed.setOnClickListener {
+            val cur = speedValues.indexOfFirst { it == player.playbackParameters.speed }.coerceAtLeast(0)
+            AlertDialog.Builder(this)
+                .setTitle(R.string.player_speed)
+                .setSingleChoiceItems(speedLabels, cur) { d, which -> player.setPlaybackSpeed(speedValues[which]); d.dismiss() }
+                .show()
+        }
+        bLock.setOnClickListener {
+            locked = true
+            pv.hideController()
+            pv.useController = false
+            bSpeed.visibility = android.view.View.GONE
+            bLock.visibility = android.view.View.GONE
+            bUnlock.visibility = android.view.View.VISIBLE
+            hint.text = getString(R.string.player_locked_hint)
+            hint.visibility = android.view.View.VISIBLE
+            hint.postDelayed({ if (locked) hint.visibility = android.view.View.GONE }, 1000)
+        }
+        bUnlock.setOnClickListener {
+            locked = false
+            pv.useController = true
+            bSpeed.visibility = android.view.View.VISIBLE
+            bLock.visibility = android.view.View.VISIBLE
+            bUnlock.visibility = android.view.View.GONE
+        }
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.systemBars())
@@ -104,6 +138,7 @@ class LocalPlayerActivity : AppCompatActivity() {
             override fun onScaleEnd(detector: android.view.ScaleGestureDetector) { pinchDone = false }
         })
         view.setOnTouchListener { _, e ->
+            if (locked) return@setOnTouchListener true
             pinch.onTouchEvent(e)
             when (e.actionMasked) {
                 android.view.MotionEvent.ACTION_DOWN -> { downX = e.x; downY = e.y; mode = 0 }
