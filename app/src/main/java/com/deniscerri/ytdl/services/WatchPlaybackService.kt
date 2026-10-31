@@ -35,7 +35,7 @@ class WatchPlaybackService : Service() {
         if (manager == null) {
             manager = PlayerNotificationManager.Builder(this, NOTIFICATION_ID, CHANNEL_ID)
                 .setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
-                    override fun getCurrentContentTitle(player: Player): CharSequence = title
+                    override fun getCurrentContentTitle(player: Player): CharSequence = player.mediaMetadata.title ?: title
                     override fun createCurrentContentIntent(player: Player): android.app.PendingIntent? = null
                     override fun getCurrentContentText(player: Player): CharSequence? = author
                     override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback): android.graphics.Bitmap? = null
