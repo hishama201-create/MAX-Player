@@ -50,9 +50,60 @@ class LocalPlayerActivity : AppCompatActivity() {
         WatchPlaybackService.author = ""
         ContextCompat.startForegroundService(this, Intent(this, WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.local_player).player = player
+        setupSeekGesture(findViewById(R.id.local_player), findViewById(R.id.seek_overlay))
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    private fun fmtTime(ms: Long): String {
+        val s = ms / 1000
+        val h = s / 3600
+        val m = (s % 3600) / 60
+        val sec = s % 60
+        val loc = java.util.Locale.getDefault()
+        return if (h > 0) String.format(loc, "%d:%02d:%02d", h, m, sec) else String.format(loc, "%02d:%02d", m, sec)
+    }
+
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
+    private fun setupSeekGesture(view: PlayerView, overlay: android.widget.TextView) {
+        val dp = resources.displayMetrics.density
+        var downX = 0f
+        var downY = 0f
+        var seeking = false
+        var startPos = 0L
+        var target = 0L
+        view.setOnTouchListener { _, e ->
+            when (e.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> { downX = e.x; downY = e.y; seeking = false }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val dx = e.x - downX
+                    val dy = e.y - downY
+                    if (!seeking && kotlin.math.abs(dx) > 24 * dp && kotlin.math.abs(dx) > kotlin.math.abs(dy) * 2) {
+                        seeking = true
+                        startPos = player.currentPosition
+                        view.hideController()
+                    }
+                    if (seeking) {
+                        val dur = player.duration
+                        val t = startPos + (dx / dp * 150).toLong()
+                        target = if (dur > 0) t.coerceIn(0L, dur) else t.coerceAtLeast(0L)
+                        val diff = target - startPos
+                        overlay.text = fmtTime(target) + "\n[" + (if (diff >= 0) "+" else "-") + fmtTime(kotlin.math.abs(diff)) + "]"
+                        overlay.visibility = android.view.View.VISIBLE
+                    }
+                }
+                android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                    if (seeking) {
+                        if (e.actionMasked == android.view.MotionEvent.ACTION_UP) player.seekTo(target)
+                        overlay.visibility = android.view.View.GONE
+                        seeking = false
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            seeking
+        }
     }
 
     override fun onDestroy() {

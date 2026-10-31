@@ -12,4 +12,16 @@
         android:keepScreenOn="true"
         app:use_controller="true"
         app:show_subtitle_button="true" />
+    <TextView
+        android:id="@+id/seek_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:shadowColor="#000000"
+        android:shadowRadius="6"
+        android:visibility="gone" />
 </FrameLayout>
