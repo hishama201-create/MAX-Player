@@ -112,6 +112,7 @@ class LocalPlayerActivity : AppCompatActivity() {
             bLock.visibility = android.view.View.GONE
             bAspect.visibility = android.view.View.GONE
             bPip.visibility = android.view.View.GONE
+            findViewById<android.view.View>(R.id.btn_back).visibility = android.view.View.GONE
             bUnlock.visibility = android.view.View.VISIBLE
             hint.text = getString(R.string.player_locked_hint)
             hint.visibility = android.view.View.VISIBLE
@@ -124,6 +125,7 @@ class LocalPlayerActivity : AppCompatActivity() {
             bLock.visibility = android.view.View.VISIBLE
             bAspect.visibility = android.view.View.VISIBLE
             bPip.visibility = android.view.View.VISIBLE
+            findViewById<android.view.View>(R.id.btn_back).visibility = android.view.View.VISIBLE
             bUnlock.visibility = android.view.View.GONE
         }
         bAspect.setOnClickListener {
@@ -137,6 +139,7 @@ class LocalPlayerActivity : AppCompatActivity() {
             hint.postDelayed({ if (hint.text.toString() == shown) hint.visibility = android.view.View.GONE }, 1000)
         }
         bPip.setOnClickListener { enterPip() }
+        findViewById<android.view.View>(R.id.btn_back).setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.systemBars())
@@ -299,7 +302,7 @@ class LocalPlayerActivity : AppCompatActivity() {
     @androidx.annotation.RequiresApi(26)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: android.content.res.Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        val ids = intArrayOf(R.id.btn_speed, R.id.btn_aspect, R.id.btn_pip, R.id.btn_lock)
+        val ids = intArrayOf(R.id.btn_speed, R.id.btn_aspect, R.id.btn_pip, R.id.btn_lock, R.id.btn_back)
         for (id in ids) findViewById<android.view.View>(id).visibility = if (isInPictureInPictureMode || locked) android.view.View.GONE else android.view.View.VISIBLE
         findViewById<android.view.View>(R.id.btn_unlock).visibility = if (!isInPictureInPictureMode && locked) android.view.View.VISIBLE else android.view.View.GONE
         findViewById<PlayerView>(R.id.local_player).useController = !isInPictureInPictureMode && !locked
