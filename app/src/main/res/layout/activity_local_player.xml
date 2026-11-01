@@ -102,4 +102,24 @@
         android:contentDescription="@string/player_unlock"
         android:src="@drawable/ic_unlock_player"
         android:visibility="gone" />
+    <ImageButton
+        android:id="@+id/btn_aspect"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="120dp"
+        android:background="@drawable/bg_player_btn"
+        android:contentDescription="@string/player_aspect"
+        android:src="@drawable/ic_aspect_player" />
+    <ImageButton
+        android:id="@+id/btn_pip"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="172dp"
+        android:background="@drawable/bg_player_btn"
+        android:contentDescription="@string/player_pip"
+        android:src="@drawable/ic_pip_player" />
 </FrameLayout>

@@ -716,4 +716,6 @@
     <string name="player_lock">Lock controls</string>
     <string name="player_unlock">Unlock</string>
     <string name="player_locked_hint">Screen locked</string>
+    <string name="player_aspect">Aspect ratio</string>
+    <string name="player_pip">Picture in picture</string>
 </resources>
