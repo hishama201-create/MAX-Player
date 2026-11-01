@@ -95,6 +95,8 @@ class LocalPlayerActivity : AppCompatActivity() {
         val bLock = findViewById<android.view.View>(R.id.btn_lock)
         val bUnlock = findViewById<android.view.View>(R.id.btn_unlock)
         val hint = findViewById<android.widget.TextView>(R.id.seek_overlay)
+        val bAspect = findViewById<android.view.View>(R.id.btn_aspect)
+        val bPip = findViewById<android.view.View>(R.id.btn_pip)
         bSpeed.setOnClickListener {
             val cur = speedValues.indexOfFirst { it == player.playbackParameters.speed }.coerceAtLeast(0)
             AlertDialog.Builder(this)
@@ -108,6 +110,8 @@ class LocalPlayerActivity : AppCompatActivity() {
             pv.useController = false
             bSpeed.visibility = android.view.View.GONE
             bLock.visibility = android.view.View.GONE
+            bAspect.visibility = android.view.View.GONE
+            bPip.visibility = android.view.View.GONE
             bUnlock.visibility = android.view.View.VISIBLE
             hint.text = getString(R.string.player_locked_hint)
             hint.visibility = android.view.View.VISIBLE
@@ -118,8 +122,21 @@ class LocalPlayerActivity : AppCompatActivity() {
             pv.useController = true
             bSpeed.visibility = android.view.View.VISIBLE
             bLock.visibility = android.view.View.VISIBLE
+            bAspect.visibility = android.view.View.VISIBLE
+            bPip.visibility = android.view.View.VISIBLE
             bUnlock.visibility = android.view.View.GONE
         }
+        bAspect.setOnClickListener {
+            val m = intArrayOf(AspectRatioFrameLayout.RESIZE_MODE_FIT, AspectRatioFrameLayout.RESIZE_MODE_ZOOM, AspectRatioFrameLayout.RESIZE_MODE_FILL)
+            val names = intArrayOf(R.string.resize_fit, R.string.resize_zoom, R.string.resize_fill)
+            val next = (m.indexOf(pv.resizeMode).coerceAtLeast(0) + 1) % 3
+            pv.resizeMode = m[next]
+            hint.text = getString(names[next])
+            hint.visibility = android.view.View.VISIBLE
+            val shown = hint.text.toString()
+            hint.postDelayed({ if (hint.text.toString() == shown) hint.visibility = android.view.View.GONE }, 1000)
+        }
+        bPip.setOnClickListener { enterPip() }
         val controller = WindowCompat.getInsetsController(window, window.decorView)
         controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.systemBars())
@@ -265,6 +282,31 @@ class LocalPlayerActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         savePosition()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (android.os.Build.VERSION.SDK_INT >= 26 && ::player.isInitialized && player.isPlaying && !itemsAreAudio && !locked) enterPip()
+    }
+
+    private fun enterPip(): Boolean {
+        if (android.os.Build.VERSION.SDK_INT < 26) return false
+        return try {
+            enterPictureInPictureMode(android.app.PictureInPictureParams.Builder().setAspectRatio(android.util.Rational(16, 9)).build())
+        } catch (e: Exception) { e.printStackTrace(); false }
+    }
+
+    @androidx.annotation.RequiresApi(26)
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: android.content.res.Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        val ids = intArrayOf(R.id.btn_speed, R.id.btn_aspect, R.id.btn_pip, R.id.btn_lock)
+        for (id in ids) findViewById<android.view.View>(id).visibility = if (isInPictureInPictureMode || locked) android.view.View.GONE else android.view.View.VISIBLE
+        findViewById<android.view.View>(R.id.btn_unlock).visibility = if (!isInPictureInPictureMode && locked) android.view.View.VISIBLE else android.view.View.GONE
+        findViewById<PlayerView>(R.id.local_player).useController = !isInPictureInPictureMode && !locked
+        if (!isInPictureInPictureMode && lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) {
+            if (::player.isInitialized) player.pause()
+            finish()
+        }
     }
 
     override fun onDestroy() {
