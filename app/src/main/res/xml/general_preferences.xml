@@ -187,7 +187,7 @@
 
         <SwitchPreferenceCompat
             android:widgetLayout="@layout/preferece_material_switch"
-            app:defaultValue="false"
+            app:defaultValue="true"
             android:icon="@drawable/ic_search_accent"
             android:key="search_suggestions"
             app:summary="@string/search_suggestions_summary"

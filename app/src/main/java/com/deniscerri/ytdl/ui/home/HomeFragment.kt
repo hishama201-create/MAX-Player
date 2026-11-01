@@ -626,7 +626,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
             }.map {
                 SearchSuggestionItem(it, SearchSuggestionType.HISTORY)
             }
-            val suggestions = if (sharedPreferences!!.getBoolean("search_suggestions", false)){
+            val suggestions = if (sharedPreferences!!.getBoolean("search_suggestions", true)){
                 withContext(Dispatchers.IO){
                     resultViewModel.getSearchSuggestions(searchQuery)
                 }
