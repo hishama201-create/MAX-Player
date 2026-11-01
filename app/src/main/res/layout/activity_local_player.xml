@@ -12,6 +12,52 @@
         android:keepScreenOn="true"
         app:use_controller="true"
         app:show_subtitle_button="true" />
+    <LinearLayout
+        android:id="@+id/disc_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FF121212"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <FrameLayout
+            android:layout_width="260dp"
+            android:layout_height="260dp">
+            <ImageView
+                android:id="@+id/disc_art"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_disc"
+                android:padding="6dp"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_music" />
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_disc_hole" />
+        </FrameLayout>
+        <TextView
+            android:id="@+id/disc_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:layout_marginHorizontal="24dp"
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/disc_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="#B3FFFFFF"
+            android:textSize="15sp" />
+    </LinearLayout>
     <TextView
         android:id="@+id/seek_overlay"
         android:layout_width="wrap_content"

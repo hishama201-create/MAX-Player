@@ -58,7 +58,7 @@ class LibraryPageFragment : Fragment() {
             val idx = currentVideos.indexOf(video); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentVideos.map { it.id }.toLongArray(), currentVideos.map { it.title }.toTypedArray(), idx, false)
         }
         musicAdapter = LibraryMusicAdapter(viewLifecycleOwner.lifecycleScope) { song ->
-            val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true)
+            val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true, currentSongs.map { it.albumId }.toLongArray(), currentSongs.map { it.artist }.toTypedArray())
         }
         list.layoutManager = LinearLayoutManager(requireContext())
         grant.setOnClickListener { permissionLauncher.launch(permissionFor()) }

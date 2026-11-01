@@ -8,6 +8,8 @@ import android.provider.MediaStore
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -25,6 +27,10 @@ class LocalPlayerActivity : AppCompatActivity() {
     private var itemIds: LongArray = LongArray(0)
     private var itemsAreAudio = false
     private var locked = false
+    private var itemAlbums: LongArray = LongArray(0)
+    private var itemArtists: Array<String> = emptyArray()
+    private var discAnim: android.animation.ObjectAnimator? = null
+    private var discListener: androidx.media3.common.Player.Listener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +45,8 @@ class LocalPlayerActivity : AppCompatActivity() {
         }
         itemIds = ids
         itemsAreAudio = isAudio
+        itemAlbums = intent.getLongArrayExtra(EXTRA_ALBUMS) ?: LongArray(0)
+        itemArtists = intent.getStringArrayExtra(EXTRA_ARTISTS) ?: emptyArray()
         val base = if (isAudio) MediaStore.Audio.Media.EXTERNAL_CONTENT_URI else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val items = ids.indices.map { i ->
             MediaItem.Builder()
@@ -58,6 +66,27 @@ class LocalPlayerActivity : AppCompatActivity() {
         WatchPlaybackService.author = ""
         ContextCompat.startForegroundService(this, Intent(this, WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.local_player).player = player
+        if (isAudio) {
+            findViewById<android.view.View>(R.id.disc_container).visibility = android.view.View.VISIBLE
+            val discImg = findViewById<android.widget.ImageView>(R.id.disc_art)
+            discAnim = android.animation.ObjectAnimator.ofFloat(discImg, android.view.View.ROTATION, 0f, 360f).apply {
+                duration = 12000
+                repeatCount = android.animation.ObjectAnimator.INFINITE
+                interpolator = android.view.animation.LinearInterpolator()
+            }
+            showDisc(player.currentMediaItemIndex)
+            discListener = object : androidx.media3.common.Player.Listener {
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    discImg.rotation = 0f
+                    showDisc(player.currentMediaItemIndex)
+                }
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    val a = discAnim ?: return
+                    if (isPlaying) { if (a.isPaused) a.resume() else if (!a.isStarted) a.start() } else if (a.isRunning) a.pause()
+                }
+            }
+            player.addListener(discListener!!)
+        }
         setupSeekGesture(findViewById(R.id.local_player), findViewById(R.id.seek_overlay))
         val speedLabels = arrayOf("0.5x", "0.75x", "1x", "1.25x", "1.5x", "2x")
         val speedValues = floatArrayOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f)
@@ -216,12 +245,31 @@ class LocalPlayerActivity : AppCompatActivity() {
         if (pos > 0L) player.seekTo(idx, pos)
     }
 
+    private fun showDisc(index: Int) {
+        if (!itemsAreAudio || index !in itemIds.indices) return
+        val title = player.getMediaItemAt(index).mediaMetadata.title?.toString() ?: ""
+        val artist = itemArtists.getOrNull(index) ?: ""
+        findViewById<android.widget.TextView>(R.id.disc_title).text = title
+        val artView = findViewById<android.widget.TextView>(R.id.disc_artist)
+        artView.text = artist
+        artView.visibility = if (artist.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+        val img = findViewById<android.widget.ImageView>(R.id.disc_art)
+        img.setImageResource(R.drawable.ic_music)
+        val song = LocalSong(itemIds[index], ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, itemIds[index]), title, artist, itemAlbums.getOrNull(index) ?: 0L, 0L, 0L)
+        lifecycleScope.launch {
+            val bmp = LocalMusicRepository.loadArt(this@LocalPlayerActivity, song)
+            if (bmp != null && player.currentMediaItemIndex == index) img.setImageBitmap(bmp)
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         savePosition()
     }
 
     override fun onDestroy() {
+        discAnim?.cancel()
+        discListener?.let { if (::player.isInitialized) player.removeListener(it) }
         super.onDestroy()
         if (::player.isInitialized) {
             if (isFinishing && player.isPlaying && WatchPlaybackService.player === player) { WatchPlaybackService.detached = true; return }
@@ -238,12 +286,16 @@ class LocalPlayerActivity : AppCompatActivity() {
         private const val EXTRA_TITLES = "titles"
         private const val EXTRA_AUDIO = "audio"
         private const val EXTRA_POSITION = "position"
+        private const val EXTRA_ALBUMS = "albums"
+        private const val EXTRA_ARTISTS = "artists"
 
-        fun start(context: Context, ids: LongArray, titles: Array<String>, position: Int, audio: Boolean) {
+        fun start(context: Context, ids: LongArray, titles: Array<String>, position: Int, audio: Boolean, albumIds: LongArray = LongArray(0), artists: Array<String> = emptyArray()) {
             context.startActivity(Intent(context, LocalPlayerActivity::class.java)
                 .putExtra(EXTRA_IDS, ids)
                 .putExtra(EXTRA_TITLES, titles)
                 .putExtra(EXTRA_POSITION, position)
+                .putExtra(EXTRA_ALBUMS, albumIds)
+                .putExtra(EXTRA_ARTISTS, artists)
                 .putExtra(EXTRA_AUDIO, audio))
         }
     }
