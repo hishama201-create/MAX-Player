@@ -30,8 +30,13 @@ class LibraryMusicAdapter(
         var artJob: Job? = null
     }
 
+    var isGrid: Boolean = false
+
+    override fun getItemViewType(position: Int): Int = if (isGrid) 1 else 0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_library_music, parent, false)
+        val layout = if (viewType == 1) R.layout.item_library_music_grid else R.layout.item_library_music
+        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
         return ViewHolder(view)
     }
 
