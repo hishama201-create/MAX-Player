@@ -111,7 +111,7 @@ class LibraryPageFragment : Fragment() {
         }
         sheet.findViewById<View>(R.id.opt_layout_grid).setOnClickListener { choose(true) }
         sheet.findViewById<View>(R.id.opt_layout_list).setOnClickListener { choose(false) }
-        val sortIds = mapOf("title" to R.id.opt_sort_title, "size" to R.id.opt_sort_size, "duration" to R.id.opt_sort_duration, "date" to R.id.opt_sort_date, "type" to R.id.opt_sort_type, "path" to R.id.opt_sort_path)
+        val sortIds = mapOf("title" to R.id.opt_sort_title, "size" to R.id.opt_sort_size, "duration" to R.id.opt_sort_duration, "date" to R.id.opt_sort_date, "type" to R.id.opt_sort_type, "path" to R.id.opt_sort_path, "resolution" to R.id.opt_sort_resolution, "framerate" to R.id.opt_sort_framerate)
         fun paintSort() {
             for ((k, id) in sortIds) {
                 val c = if (sortKey == k) primary else normal
@@ -201,6 +201,8 @@ class LibraryPageFragment : Fragment() {
             "date" -> items.sortedBy { it.dateAdded }
             "type" -> items.sortedBy { it.mimeType }
             "path" -> items.sortedBy { it.path.lowercase() }
+            "resolution" -> items.sortedBy { it.width.toLong() * it.height }
+            "framerate" -> items.sortedBy { it.frameRate }
             else -> items
         }
         return if (sortAsc) sorted else sorted.reversed()

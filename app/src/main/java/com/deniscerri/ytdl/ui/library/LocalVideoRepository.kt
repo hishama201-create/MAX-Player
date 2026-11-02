@@ -18,7 +18,10 @@ data class LocalVideo(
     val size: Long,
     val dateAdded: Long = 0L,
     val mimeType: String = "",
-    val path: String = ""
+    val path: String = "",
+    val width: Int = 0,
+    val height: Int = 0,
+    val frameRate: Float = 0f
 )
 
 object LocalVideoRepository {
@@ -38,8 +41,9 @@ object LocalVideoRepository {
             MediaStore.Video.Media.MIME_TYPE,
             if (Build.VERSION.SDK_INT >= 29) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Video.Media.DATA
         )
+        val fullProjection = projection + arrayOf(MediaStore.Video.Media.WIDTH, MediaStore.Video.Media.HEIGHT) + (if (Build.VERSION.SDK_INT >= 30) arrayOf(MediaStore.Video.Media.CAPTURE_FRAMERATE) else emptyArray<String>())
         val result = mutableListOf<LocalVideo>()
-        context.contentResolver.query(collection, projection, null, null, "${MediaStore.Video.Media.DATE_ADDED} DESC")?.use { c ->
+        context.contentResolver.query(collection, fullProjection, null, null, "${MediaStore.Video.Media.DATE_ADDED} DESC")?.use { c ->
             val idCol = c.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val nameCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
             val durCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
@@ -47,9 +51,12 @@ object LocalVideoRepository {
             val dateCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
             val mimeCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE)
             val pathCol = c.getColumnIndexOrThrow(if (Build.VERSION.SDK_INT >= 29) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Video.Media.DATA)
+            val widthCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.WIDTH)
+            val heightCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.HEIGHT)
+            val frameCol = if (Build.VERSION.SDK_INT >= 30) c.getColumnIndex(MediaStore.Video.Media.CAPTURE_FRAMERATE) else -1
             while (c.moveToNext()) {
                 val id = c.getLong(idCol)
-                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol), c.getLong(dateCol), c.getString(mimeCol) ?: "", c.getString(pathCol) ?: ""))
+                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol), c.getLong(dateCol), c.getString(mimeCol) ?: "", c.getString(pathCol) ?: "", c.getInt(widthCol), c.getInt(heightCol), if (frameCol >= 0 && !c.isNull(frameCol)) c.getFloat(frameCol) else 0f))
             }
         }
         result
