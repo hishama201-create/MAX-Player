@@ -201,6 +201,7 @@ class LibraryPageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (::list.isInitialized && hasPermission() != lastGranted) refresh()
+        if (::list.isInitialized && tab == 0 && list.adapter === videoAdapter) { currentVideos = sortedVideos(currentVideos); videoAdapter.submitList(currentVideos) }
     }
 
     private fun hasPermission(): Boolean {
