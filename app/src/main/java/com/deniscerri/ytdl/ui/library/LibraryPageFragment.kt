@@ -35,6 +35,8 @@ class LibraryPageFragment : Fragment() {
     private var lastGranted = false
     private var isGrid = false
     private lateinit var optionsBtn: View
+    private var sortKey = "title"
+    private var sortAsc = true
 
     private fun permissionFor(): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -69,9 +71,16 @@ class LibraryPageFragment : Fragment() {
             val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true, currentSongs.map { it.albumId }.toLongArray(), currentSongs.map { it.artist }.toTypedArray())
         }
         isGrid = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("grid_" + tab, false)
+        sortKey = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getString("sort_key_" + tab, "title") ?: "title"
+        sortAsc = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("sort_asc_" + tab, true)
         applyLayout()
         grant.setOnClickListener { permissionLauncher.launch(permissionFor()) }
         refresh()
+    }
+
+    private fun reload() {
+        if (tab == 0) { currentVideos = sortedVideos(currentVideos); videoAdapter.submitList(currentVideos) }
+        else { currentSongs = sortedSongs(currentSongs); musicAdapter.submitList(currentSongs) }
     }
 
     private fun showOptionsSheet() {
@@ -98,6 +107,26 @@ class LibraryPageFragment : Fragment() {
         }
         sheet.findViewById<View>(R.id.opt_layout_grid).setOnClickListener { choose(true) }
         sheet.findViewById<View>(R.id.opt_layout_list).setOnClickListener { choose(false) }
+        val sortIds = mapOf("title" to R.id.opt_sort_title, "size" to R.id.opt_sort_size, "duration" to R.id.opt_sort_duration)
+        fun paintSort() {
+            for ((k, id) in sortIds) {
+                val c = if (sortKey == k) primary else normal
+                val base = resources.getResourceEntryName(id)
+                sheet.findViewById<ImageView>(resources.getIdentifier(base + "_icon", "id", ctx.packageName)).setColorFilter(c)
+                sheet.findViewById<TextView>(resources.getIdentifier(base + "_text", "id", ctx.packageName)).setTextColor(c)
+            }
+            sheet.findViewById<TextView>(R.id.opt_order_asc).setTextColor(if (sortAsc) primary else normal)
+            sheet.findViewById<TextView>(R.id.opt_order_desc).setTextColor(if (sortAsc) normal else primary)
+        }
+        fun saveSort() {
+            ctx.getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).edit().putString("sort_key_" + tab, sortKey).putBoolean("sort_asc_" + tab, sortAsc).apply()
+            reload()
+            paintSort()
+        }
+        for ((k, id) in sortIds) sheet.findViewById<View>(id).setOnClickListener { sortKey = k; saveSort() }
+        sheet.findViewById<View>(R.id.opt_order_asc).setOnClickListener { sortAsc = true; saveSort() }
+        sheet.findViewById<View>(R.id.opt_order_desc).setOnClickListener { sortAsc = false; saveSort() }
+        paintSort()
         paint()
         dialog.setContentView(sheet)
         dialog.show()
@@ -141,7 +170,7 @@ class LibraryPageFragment : Fragment() {
             } else {
                 list.adapter = videoAdapter
                 showList()
-                currentVideos = videos; videoAdapter.submitList(videos)
+                currentVideos = sortedVideos(videos); videoAdapter.submitList(currentVideos)
             }
         }
     }
@@ -155,9 +184,29 @@ class LibraryPageFragment : Fragment() {
             } else {
                 list.adapter = musicAdapter
                 showList()
-                currentSongs = songs; musicAdapter.submitList(songs)
+                currentSongs = sortedSongs(songs); musicAdapter.submitList(currentSongs)
             }
         }
+    }
+
+    private fun sortedVideos(items: List<LocalVideo>): List<LocalVideo> {
+        val sorted = when (sortKey) {
+            "title" -> items.sortedBy { it.title.lowercase() }
+            "size" -> items.sortedBy { it.size }
+            "duration" -> items.sortedBy { it.durationMs }
+            else -> items
+        }
+        return if (sortAsc) sorted else sorted.reversed()
+    }
+
+    private fun sortedSongs(items: List<LocalSong>): List<LocalSong> {
+        val sorted = when (sortKey) {
+            "title" -> items.sortedBy { it.title.lowercase() }
+            "size" -> items.sortedBy { it.size }
+            "duration" -> items.sortedBy { it.durationMs }
+            else -> items
+        }
+        return if (sortAsc) sorted else sorted.reversed()
     }
 
     private fun showList() {
