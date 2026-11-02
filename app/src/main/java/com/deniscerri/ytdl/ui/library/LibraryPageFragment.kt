@@ -30,6 +30,7 @@ class LibraryPageFragment : Fragment() {
     private lateinit var grant: Button
     private lateinit var videoAdapter: LibraryVideoAdapter
     private lateinit var musicAdapter: LibraryMusicAdapter
+    private lateinit var folderAdapter: LibraryFolderAdapter
     private var currentVideos: List<LocalVideo> = emptyList()
     private var currentSongs: List<LocalSong> = emptyList()
     private var lastGranted = false
@@ -38,6 +39,11 @@ class LibraryPageFragment : Fragment() {
     private var sortKey = "title"
     private var sortAsc = true
     private var viewMode = "files"
+    private var allVideos: List<LocalVideo> = emptyList()
+    private var openFolder: String? = null
+    private val backCallback = object : androidx.activity.OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() { openFolder = null; renderVideos() }
+    }
 
     private fun permissionFor(): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -71,6 +77,8 @@ class LibraryPageFragment : Fragment() {
         musicAdapter = LibraryMusicAdapter(viewLifecycleOwner.lifecycleScope) { song ->
             val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true, currentSongs.map { it.albumId }.toLongArray(), currentSongs.map { it.artist }.toTypedArray())
         }
+        folderAdapter = LibraryFolderAdapter { folder -> openFolder = folder.path; renderVideos() }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
         isGrid = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("grid_" + tab, false)
         sortKey = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getString("sort_key_" + tab, "title") ?: "title"
         sortAsc = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("sort_asc_" + tab, true)
@@ -85,7 +93,7 @@ class LibraryPageFragment : Fragment() {
     }
 
     private fun reload() {
-        if (tab == 0) { currentVideos = sortedVideos(currentVideos); videoAdapter.submitList(currentVideos) }
+        if (tab == 0) { renderVideos() }
         else { currentSongs = sortedSongs(currentSongs); musicAdapter.submitList(currentSongs) }
     }
 
@@ -146,6 +154,8 @@ class LibraryPageFragment : Fragment() {
             viewMode = k
             ctx.getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).edit().putString("view_mode", k).apply()
             paintMode()
+            openFolder = null
+            if (tab == 0) renderVideos()
         }
         if (tab == 1) listOf(R.id.opt_mode_all, R.id.opt_mode_files, R.id.opt_mode_folders).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
         paintMode()
@@ -153,6 +163,28 @@ class LibraryPageFragment : Fragment() {
         paint()
         dialog.setContentView(sheet)
         dialog.show()
+    }
+
+    private fun folderName(path: String): String {
+        val trimmed = path.trim().trimEnd('/')
+        val last = trimmed.substringAfterLast('/')
+        return if (last.isEmpty()) "/" else last
+    }
+
+    private fun renderVideos() {
+        val folder = openFolder
+        backCallback.isEnabled = (folder != null)
+        if (viewMode == "files" || folder != null) {
+            val shown = if (folder == null) allVideos else allVideos.filter { it.path == folder }
+            list.adapter = videoAdapter
+            currentVideos = sortedVideos(shown)
+            videoAdapter.submitList(currentVideos)
+        } else {
+            val groups = allVideos.groupBy { it.path }
+            val folders = groups.map { (p, v) -> LibraryFolder(p, folderName(p), v.size) }.sortedBy { it.name.lowercase() }
+            list.adapter = folderAdapter
+            folderAdapter.submitList(folders)
+        }
     }
 
     private fun applyLayout() {
@@ -191,9 +223,9 @@ class LibraryPageFragment : Fragment() {
             if (videos.isEmpty()) {
                 showMessage(getString(R.string.library_no_videos), false)
             } else {
-                list.adapter = videoAdapter
+                allVideos = videos
                 showList()
-                currentVideos = sortedVideos(videos); videoAdapter.submitList(currentVideos)
+                renderVideos()
             }
         }
     }
