@@ -177,19 +177,21 @@ class LibraryPageFragment : Fragment() {
         if (viewMode == "files" || folder != null) {
             val shown = if (folder == null) allVideos else allVideos.filter { it.path == folder }
             list.adapter = videoAdapter
+            applyLayout()
             currentVideos = sortedVideos(shown)
             videoAdapter.submitList(currentVideos)
         } else {
             val groups = allVideos.groupBy { it.path }
             val folders = groups.map { (p, v) -> LibraryFolder(p, folderName(p), v.size) }.sortedBy { it.name.lowercase() }
             list.adapter = folderAdapter
+            applyLayout()
             folderAdapter.submitList(folders)
         }
     }
 
     private fun applyLayout() {
         val ctx = requireContext()
-        list.layoutManager = if (isGrid) GridLayoutManager(ctx, 2) else LinearLayoutManager(ctx)
+        list.layoutManager = if (isGrid && !(tab == 0 && viewMode != "files" && openFolder == null)) GridLayoutManager(ctx, 2) else LinearLayoutManager(ctx)
         videoAdapter.isGrid = isGrid
         musicAdapter.isGrid = isGrid
         if (list.adapter != null) list.adapter = list.adapter
