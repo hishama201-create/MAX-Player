@@ -79,7 +79,7 @@ class LibraryPageFragment : Fragment() {
     }
 
     fun scrollToTop() {
-        if (::list.isInitialized) list.smoothScrollToPosition(0)
+        if (::list.isInitialized) list.scrollToPosition(0)
     }
 
     private fun reload() {
