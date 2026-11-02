@@ -89,33 +89,6 @@
             android:layout_marginTop="12dp"
             android:orientation="horizontal">
             <LinearLayout
-                android:id="@+id/opt_mode_all"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="8dp">
-                <ImageView
-                    android:id="@+id/opt_mode_all_icon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_lib_all_folders" />
-                <TextView
-                    android:id="@+id/opt_mode_all_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="@string/library_mode_all_folders"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="13sp" />
-            </LinearLayout>
-            <LinearLayout
                 android:id="@+id/opt_mode_files"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
