@@ -157,7 +157,7 @@ class LibraryPageFragment : Fragment() {
             openFolder = null
             if (tab == 0) renderVideos()
         }
-        if (tab == 1) listOf(R.id.opt_mode_all, R.id.opt_mode_files, R.id.opt_mode_folders).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
+        if (tab == 1) listOf(R.id.opt_mode_title, R.id.opt_mode_all, R.id.opt_mode_files, R.id.opt_mode_folders).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
         paintMode()
         paintSort()
         paint()
