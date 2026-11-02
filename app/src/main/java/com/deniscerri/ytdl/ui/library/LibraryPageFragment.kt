@@ -78,6 +78,10 @@ class LibraryPageFragment : Fragment() {
         refresh()
     }
 
+    fun scrollToTop() {
+        if (::list.isInitialized) list.smoothScrollToPosition(0)
+    }
+
     private fun reload() {
         if (tab == 0) { currentVideos = sortedVideos(currentVideos); videoAdapter.submitList(currentVideos) }
         else { currentSongs = sortedSongs(currentSongs); musicAdapter.submitList(currentSongs) }

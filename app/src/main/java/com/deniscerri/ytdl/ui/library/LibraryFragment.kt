@@ -24,5 +24,12 @@ class LibraryFragment : Fragment() {
         TabLayoutMediator(tabs, pager) { tab, position ->
             tab.text = getString(if (position == 0) R.string.video else R.string.music)
         }.attach()
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {}
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                (childFragmentManager.findFragmentByTag("f" + pager.currentItem) as? LibraryPageFragment)?.scrollToTop()
+            }
+        })
     }
 }
