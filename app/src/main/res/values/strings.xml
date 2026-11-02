@@ -739,4 +739,8 @@
     <string name="player_aspect">Aspect ratio</string>
     <string name="player_pip">Picture in picture</string>
     <string name="player_back">Back</string>
+    <plurals name="lib_folder_videos">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
 </resources>

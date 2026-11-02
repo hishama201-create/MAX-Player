@@ -726,4 +726,12 @@
     <string name="player_aspect">نسبة العرض</string>
     <string name="player_pip">صورة داخل صورة</string>
     <string name="player_back">رجوع</string>
+    <plurals name="lib_folder_videos">
+        <item quantity="zero">لا فيديوهات</item>
+        <item quantity="one">فيديو واحد</item>
+        <item quantity="two">فيديوان</item>
+        <item quantity="few">%d فيديوهات</item>
+        <item quantity="many">%d فيديو</item>
+        <item quantity="other">%d فيديو</item>
+    </plurals>
 </resources>

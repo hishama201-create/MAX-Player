@@ -28,7 +28,7 @@ class LibraryFolderAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.name.text = item.name
-        holder.count.text = item.count.toString()
+        holder.count.text = holder.itemView.resources.getQuantityString(R.plurals.lib_folder_videos, item.count, item.count)
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 
