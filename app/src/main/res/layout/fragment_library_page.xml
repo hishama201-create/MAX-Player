@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical|end"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
+        <ImageButton
+            android:id="@+id/library_options_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/library_sort_header"
+            android:src="@drawable/baseline_sort_24" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/library_list"
         android:layout_width="match_parent"
@@ -34,4 +53,5 @@
             android:text="@string/library_grant"
             android:visibility="gone" />
     </LinearLayout>
-</FrameLayout>
+    </FrameLayout>
+</LinearLayout>
