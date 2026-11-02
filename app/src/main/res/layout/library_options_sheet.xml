@@ -449,6 +449,8 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:text="@string/library_order_asc"
+                android:drawableStart="@drawable/ic_arrow_up"
+                android:drawablePadding="8dp"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="14sp" />
             <TextView
@@ -461,6 +463,8 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:text="@string/library_order_desc"
+                android:drawableStart="@drawable/ic_down"
+                android:drawablePadding="8dp"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="14sp" />
         </LinearLayout>

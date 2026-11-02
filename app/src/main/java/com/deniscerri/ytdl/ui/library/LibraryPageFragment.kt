@@ -132,6 +132,8 @@ class LibraryPageFragment : Fragment() {
             }
             sheet.findViewById<TextView>(R.id.opt_order_asc).setTextColor(if (sortAsc) primary else normal)
             sheet.findViewById<TextView>(R.id.opt_order_desc).setTextColor(if (sortAsc) normal else primary)
+            sheet.findViewById<TextView>(R.id.opt_order_asc).compoundDrawableTintList = android.content.res.ColorStateList.valueOf(if (sortAsc) primary else normal)
+            sheet.findViewById<TextView>(R.id.opt_order_desc).compoundDrawableTintList = android.content.res.ColorStateList.valueOf(if (sortAsc) normal else primary)
         }
         fun saveSort() {
             ctx.getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).edit().putString("sort_key_" + tab, sortKey).putBoolean("sort_asc_" + tab, sortAsc).apply()
