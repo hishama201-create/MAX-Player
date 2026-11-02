@@ -15,9 +15,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.deniscerri.ytdl.R
 import kotlinx.coroutines.launch
+import android.widget.ImageView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.color.MaterialColors
 
 class LibraryPageFragment : Fragment() {
     private var tab = 0
@@ -29,6 +33,8 @@ class LibraryPageFragment : Fragment() {
     private var currentVideos: List<LocalVideo> = emptyList()
     private var currentSongs: List<LocalSong> = emptyList()
     private var lastGranted = false
+    private var isGrid = false
+    private lateinit var optionsBtn: View
 
     private fun permissionFor(): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -52,6 +58,8 @@ class LibraryPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         list = view.findViewById(R.id.library_list)
+        optionsBtn = view.findViewById(R.id.library_options_btn)
+        optionsBtn.setOnClickListener { showOptionsSheet() }
         placeholder = view.findViewById(R.id.library_placeholder)
         grant = view.findViewById(R.id.library_grant)
         videoAdapter = LibraryVideoAdapter(viewLifecycleOwner.lifecycleScope) { video ->
@@ -60,9 +68,47 @@ class LibraryPageFragment : Fragment() {
         musicAdapter = LibraryMusicAdapter(viewLifecycleOwner.lifecycleScope) { song ->
             val idx = currentSongs.indexOf(song); if (idx >= 0) LocalPlayerActivity.start(requireContext(), currentSongs.map { it.id }.toLongArray(), currentSongs.map { it.title }.toTypedArray(), idx, true, currentSongs.map { it.albumId }.toLongArray(), currentSongs.map { it.artist }.toTypedArray())
         }
-        list.layoutManager = LinearLayoutManager(requireContext())
+        isGrid = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("grid_" + tab, false)
+        applyLayout()
         grant.setOnClickListener { permissionLauncher.launch(permissionFor()) }
         refresh()
+    }
+
+    private fun showOptionsSheet() {
+        val ctx = requireContext()
+        val dialog = BottomSheetDialog(ctx)
+        val sheet = layoutInflater.inflate(R.layout.library_options_sheet, null)
+        val primary = MaterialColors.getColor(sheet, R.attr.colorPrimary)
+        val normal = MaterialColors.getColor(sheet, com.google.android.material.R.attr.colorOnSurface)
+        val gridIcon = sheet.findViewById<ImageView>(R.id.opt_layout_grid_icon)
+        val gridText = sheet.findViewById<TextView>(R.id.opt_layout_grid_text)
+        val listIcon = sheet.findViewById<ImageView>(R.id.opt_layout_list_icon)
+        val listText = sheet.findViewById<TextView>(R.id.opt_layout_list_text)
+        fun paint() {
+            gridIcon.setColorFilter(if (isGrid) primary else normal)
+            gridText.setTextColor(if (isGrid) primary else normal)
+            listIcon.setColorFilter(if (isGrid) normal else primary)
+            listText.setTextColor(if (isGrid) normal else primary)
+        }
+        fun choose(grid: Boolean) {
+            isGrid = grid
+            ctx.getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).edit().putBoolean("grid_" + tab, grid).apply()
+            applyLayout()
+            paint()
+        }
+        sheet.findViewById<View>(R.id.opt_layout_grid).setOnClickListener { choose(true) }
+        sheet.findViewById<View>(R.id.opt_layout_list).setOnClickListener { choose(false) }
+        paint()
+        dialog.setContentView(sheet)
+        dialog.show()
+    }
+
+    private fun applyLayout() {
+        val ctx = requireContext()
+        list.layoutManager = if (isGrid) GridLayoutManager(ctx, 2) else LinearLayoutManager(ctx)
+        videoAdapter.isGrid = isGrid
+        musicAdapter.isGrid = isGrid
+        if (list.adapter != null) list.adapter = list.adapter
     }
 
     override fun onResume() {
