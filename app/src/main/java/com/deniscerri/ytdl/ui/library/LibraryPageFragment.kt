@@ -111,7 +111,7 @@ class LibraryPageFragment : Fragment() {
         }
         sheet.findViewById<View>(R.id.opt_layout_grid).setOnClickListener { choose(true) }
         sheet.findViewById<View>(R.id.opt_layout_list).setOnClickListener { choose(false) }
-        val sortIds = mapOf("title" to R.id.opt_sort_title, "size" to R.id.opt_sort_size, "duration" to R.id.opt_sort_duration, "date" to R.id.opt_sort_date, "type" to R.id.opt_sort_type, "path" to R.id.opt_sort_path, "resolution" to R.id.opt_sort_resolution, "framerate" to R.id.opt_sort_framerate)
+        val sortIds = mapOf("title" to R.id.opt_sort_title, "size" to R.id.opt_sort_size, "duration" to R.id.opt_sort_duration, "date" to R.id.opt_sort_date, "type" to R.id.opt_sort_type, "path" to R.id.opt_sort_path, "resolution" to R.id.opt_sort_resolution, "framerate" to R.id.opt_sort_framerate, "status" to R.id.opt_sort_status, "watch_time" to R.id.opt_sort_watch_time)
         fun paintSort() {
             for ((k, id) in sortIds) {
                 val c = if (sortKey == k) primary else normal
@@ -194,6 +194,7 @@ class LibraryPageFragment : Fragment() {
     }
 
     private fun sortedVideos(items: List<LocalVideo>): List<LocalVideo> {
+        val prefs = requireContext().getSharedPreferences("watch_positions", android.content.Context.MODE_PRIVATE)
         val sorted = when (sortKey) {
             "title" -> items.sortedBy { it.title.lowercase() }
             "size" -> items.sortedBy { it.size }
@@ -203,6 +204,8 @@ class LibraryPageFragment : Fragment() {
             "path" -> items.sortedBy { it.path.lowercase() }
             "resolution" -> items.sortedBy { it.width.toLong() * it.height }
             "framerate" -> items.sortedBy { it.frameRate }
+            "watch_time" -> items.sortedBy { prefs.getLong("v_" + it.id, 0L) }
+            "status" -> items.sortedBy { if (prefs.contains("v_" + it.id)) 0 else 1 }
             else -> items
         }
         return if (sortAsc) sorted else sorted.reversed()
