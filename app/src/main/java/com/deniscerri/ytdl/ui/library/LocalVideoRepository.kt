@@ -15,7 +15,10 @@ data class LocalVideo(
     val uri: Uri,
     val title: String,
     val durationMs: Long,
-    val size: Long
+    val size: Long,
+    val dateAdded: Long = 0L,
+    val mimeType: String = "",
+    val path: String = ""
 )
 
 object LocalVideoRepository {
@@ -30,7 +33,10 @@ object LocalVideoRepository {
             MediaStore.Video.Media._ID,
             MediaStore.Video.Media.DISPLAY_NAME,
             MediaStore.Video.Media.DURATION,
-            MediaStore.Video.Media.SIZE
+            MediaStore.Video.Media.SIZE,
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.MIME_TYPE,
+            if (Build.VERSION.SDK_INT >= 29) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Video.Media.DATA
         )
         val result = mutableListOf<LocalVideo>()
         context.contentResolver.query(collection, projection, null, null, "${MediaStore.Video.Media.DATE_ADDED} DESC")?.use { c ->
@@ -38,9 +44,12 @@ object LocalVideoRepository {
             val nameCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
             val durCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
             val sizeCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
+            val dateCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+            val mimeCol = c.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE)
+            val pathCol = c.getColumnIndexOrThrow(if (Build.VERSION.SDK_INT >= 29) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Video.Media.DATA)
             while (c.moveToNext()) {
                 val id = c.getLong(idCol)
-                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol)))
+                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol), c.getLong(dateCol), c.getString(mimeCol) ?: "", c.getString(pathCol) ?: ""))
             }
         }
         result
