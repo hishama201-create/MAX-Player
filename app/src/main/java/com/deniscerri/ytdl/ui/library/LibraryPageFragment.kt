@@ -37,6 +37,7 @@ class LibraryPageFragment : Fragment() {
     private lateinit var optionsBtn: View
     private var sortKey = "title"
     private var sortAsc = true
+    private var viewMode = "files"
 
     private fun permissionFor(): String {
         if (Build.VERSION.SDK_INT < 33) return Manifest.permission.READ_EXTERNAL_STORAGE
@@ -73,6 +74,7 @@ class LibraryPageFragment : Fragment() {
         isGrid = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("grid_" + tab, false)
         sortKey = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getString("sort_key_" + tab, "title") ?: "title"
         sortAsc = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getBoolean("sort_asc_" + tab, true)
+        viewMode = requireContext().getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).getString("view_mode", "files") ?: "files"
         applyLayout()
         grant.setOnClickListener { permissionLauncher.launch(permissionFor()) }
         refresh()
@@ -131,6 +133,22 @@ class LibraryPageFragment : Fragment() {
         sheet.findViewById<View>(R.id.opt_order_asc).setOnClickListener { sortAsc = true; saveSort() }
         sheet.findViewById<View>(R.id.opt_order_desc).setOnClickListener { sortAsc = false; saveSort() }
         if (tab == 1) listOf(R.id.opt_sort_date, R.id.opt_sort_type, R.id.opt_sort_path, R.id.opt_sort_resolution, R.id.opt_sort_framerate, R.id.opt_sort_status, R.id.opt_sort_watch_time).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
+        val modeIds = mapOf("files" to R.id.opt_mode_files, "folders" to R.id.opt_mode_folders, "all" to R.id.opt_mode_all)
+        fun paintMode() {
+            for ((k, id) in modeIds) {
+                val c = if (viewMode == k) primary else normal
+                val base = resources.getResourceEntryName(id)
+                sheet.findViewById<ImageView>(resources.getIdentifier(base + "_icon", "id", ctx.packageName)).setColorFilter(c)
+                sheet.findViewById<TextView>(resources.getIdentifier(base + "_text", "id", ctx.packageName)).setTextColor(c)
+            }
+        }
+        for ((k, id) in modeIds) sheet.findViewById<View>(id).setOnClickListener {
+            viewMode = k
+            ctx.getSharedPreferences("library_prefs", android.content.Context.MODE_PRIVATE).edit().putString("view_mode", k).apply()
+            paintMode()
+        }
+        if (tab == 1) listOf(R.id.opt_mode_all, R.id.opt_mode_files, R.id.opt_mode_folders).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
+        paintMode()
         paintSort()
         paint()
         dialog.setContentView(sheet)
