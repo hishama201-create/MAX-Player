@@ -56,7 +56,7 @@ object LocalVideoRepository {
             val frameCol = if (Build.VERSION.SDK_INT >= 30) c.getColumnIndex(MediaStore.Video.Media.CAPTURE_FRAMERATE) else -1
             while (c.moveToNext()) {
                 val id = c.getLong(idCol)
-                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol), c.getLong(dateCol), c.getString(mimeCol) ?: "", c.getString(pathCol) ?: "", c.getInt(widthCol), c.getInt(heightCol), if (frameCol >= 0 && !c.isNull(frameCol)) c.getFloat(frameCol) else 0f))
+                result.add(LocalVideo(id, ContentUris.withAppendedId(collection, id), c.getString(nameCol) ?: "", c.getLong(durCol), c.getLong(sizeCol), c.getLong(dateCol), c.getString(mimeCol) ?: "", (c.getString(pathCol) ?: "").let { if (Build.VERSION.SDK_INT >= 29) it else it.substringBeforeLast('/', "") + "/" }, c.getInt(widthCol), c.getInt(heightCol), if (frameCol >= 0 && !c.isNull(frameCol)) c.getFloat(frameCol) else 0f))
             }
         }
         result
