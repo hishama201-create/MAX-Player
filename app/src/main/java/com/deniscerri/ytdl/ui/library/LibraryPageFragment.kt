@@ -130,6 +130,7 @@ class LibraryPageFragment : Fragment() {
         for ((k, id) in sortIds) sheet.findViewById<View>(id).setOnClickListener { sortKey = k; saveSort() }
         sheet.findViewById<View>(R.id.opt_order_asc).setOnClickListener { sortAsc = true; saveSort() }
         sheet.findViewById<View>(R.id.opt_order_desc).setOnClickListener { sortAsc = false; saveSort() }
+        if (tab == 1) listOf(R.id.opt_sort_date, R.id.opt_sort_type, R.id.opt_sort_path, R.id.opt_sort_resolution, R.id.opt_sort_framerate, R.id.opt_sort_status, R.id.opt_sort_watch_time).forEach { sheet.findViewById<View>(it).visibility = View.GONE }
         paintSort()
         paint()
         dialog.setContentView(sheet)
