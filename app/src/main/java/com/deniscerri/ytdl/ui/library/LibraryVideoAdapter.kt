@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -26,10 +27,13 @@ class LibraryVideoAdapter(
         val title: TextView = itemView.findViewById(R.id.lib_video_title)
         val size: TextView = itemView.findViewById(R.id.lib_video_size)
         val duration: TextView = itemView.findViewById(R.id.lib_video_duration)
+        val progress: ProgressBar = itemView.findViewById(R.id.lib_video_progress)
         var thumbJob: Job? = null
     }
 
     var isGrid: Boolean = false
+    var positions: Map<Long, Long> = emptyMap()
+        set(value) { field = value; notifyDataSetChanged() }
 
     override fun getItemViewType(position: Int): Int = if (isGrid) 1 else 0
 
@@ -44,6 +48,8 @@ class LibraryVideoAdapter(
         holder.title.text = item.title
         holder.size.text = FileUtil.convertFileSize(item.size)
         holder.duration.text = (item.durationMs / 1000).toInt().toStringDuration(Locale.US)
+        val pos = positions[item.id] ?: 0L
+        if (pos > 0L && item.durationMs > 0L) { holder.progress.progress = (pos * 1000L / item.durationMs).toInt().coerceIn(0, 1000); holder.progress.visibility = View.VISIBLE } else { holder.progress.visibility = View.GONE }
         holder.thumb.setImageDrawable(null)
         holder.thumbJob?.cancel()
         holder.thumbJob = scope.launch {

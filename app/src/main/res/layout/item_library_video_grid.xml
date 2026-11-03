@@ -33,6 +33,7 @@
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="@id/lib_video_thumb"
             app:layout_constraintEnd_toEndOf="@id/lib_video_thumb" />
+        <ProgressBar android:id="@+id/lib_video_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="0dp" android:layout_height="3dp" android:max="1000" android:visibility="gone" app:layout_constraintBottom_toBottomOf="@id/lib_video_thumb" app:layout_constraintStart_toStartOf="@id/lib_video_thumb" app:layout_constraintEnd_toEndOf="@id/lib_video_thumb" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <TextView
         android:id="@+id/lib_video_title"

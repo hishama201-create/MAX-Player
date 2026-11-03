@@ -182,7 +182,7 @@ class LibraryPageFragment : Fragment() {
             list.adapter = videoAdapter
             applyLayout()
             currentVideos = sortedVideos(shown)
-            videoAdapter.submitList(currentVideos)
+            videoAdapter.positions = loadPositions(currentVideos); videoAdapter.submitList(currentVideos)
         } else {
             val groups = allVideos.groupBy { it.path }
             val folders = groups.map { (p, v) -> LibraryFolder(p, folderName(p), v.size) }.sortedBy { it.name.lowercase() }
@@ -203,7 +203,7 @@ class LibraryPageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (::list.isInitialized && hasPermission() != lastGranted) refresh()
-        if (::list.isInitialized && tab == 0 && list.adapter === videoAdapter) { currentVideos = sortedVideos(currentVideos); videoAdapter.submitList(currentVideos) }
+        if (::list.isInitialized && tab == 0 && list.adapter === videoAdapter) { currentVideos = sortedVideos(currentVideos); videoAdapter.positions = loadPositions(currentVideos); videoAdapter.submitList(currentVideos) }
     }
 
     private fun hasPermission(): Boolean {
@@ -248,6 +248,11 @@ class LibraryPageFragment : Fragment() {
                 currentSongs = sortedSongs(songs); musicAdapter.submitList(currentSongs)
             }
         }
+    }
+
+    private fun loadPositions(items: List<LocalVideo>): Map<Long, Long> {
+        val prefs = requireContext().getSharedPreferences("watch_positions", android.content.Context.MODE_PRIVATE)
+        return items.associate { it.id to prefs.getLong("v_" + it.id, 0L) }.filterValues { it > 0L }
     }
 
     private fun sortedVideos(items: List<LocalVideo>): List<LocalVideo> {
