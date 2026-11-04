@@ -299,4 +299,13 @@
 
     </LinearLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/shorts_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/shorts"
+        app:srcCompat="@drawable/ic_shorts" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
