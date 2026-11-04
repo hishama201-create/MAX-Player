@@ -107,6 +107,10 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
             .getOrDefault(Pair(listOf(""), null))
     }
 
+    suspend fun getChannelShorts(channelUrl: String, count: Int = 20) : List<ResultItem> {
+        return ytdlpUtil.getChannelShorts(channelUrl, count)
+    }
+
     suspend fun search(inputQuery: String, resetResults: Boolean, addToResults: Boolean) : List<ResultItem>{
         if (resetResults) deleteAll()
         val res = when(sharedPreferences.getString("search_engine", "ytsearch")) {
