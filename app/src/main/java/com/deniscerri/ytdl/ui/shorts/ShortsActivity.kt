@@ -56,6 +56,7 @@ class ShortsActivity : BaseActivity() {
             onDownload = { item -> downloadItem(item) }
         )
         pager = findViewById(R.id.shorts_pager)
+        findViewById<android.view.View>(R.id.shorts_back).setOnClickListener { finish() }
         pager.adapter = adapter
         pager.offscreenPageLimit = 1
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
