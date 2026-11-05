@@ -64,6 +64,7 @@ class ShortsActivity : BaseActivity() {
         })
 
         loadShorts()
+        lifecycleScope.launch { while (true) { val d = player.duration; if (d > 0 && player.isPlaying) { val h = (pager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView)?.findViewHolderForAdapterPosition(pager.currentItem) as? ShortsAdapter.ViewHolder; h?.progress?.progress = (player.currentPosition * 1000 / d).toInt() }; kotlinx.coroutines.delay(200) } }
     }
 
     private fun loadShorts() {
