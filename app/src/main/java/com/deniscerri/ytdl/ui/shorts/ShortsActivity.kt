@@ -98,9 +98,10 @@ class ShortsActivity : BaseActivity() {
         playJob = lifecycleScope.launch {
             val urls = withContext(Dispatchers.IO) { resultViewModel.getStreamingUrlAndChapters(item.url, 480).first }
             val url = urls.firstOrNull { it.isNotBlank() } ?: return@launch
-            val holder = (pager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView).findViewHolderForAdapterPosition(position) as? ShortsAdapter.ViewHolder
+            var holder: ShortsAdapter.ViewHolder? = null
+            for (i in 0 until 10) { holder = (pager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView).findViewHolderForAdapterPosition(position) as? ShortsAdapter.ViewHolder; if (holder != null) break; kotlinx.coroutines.delay(50) }
             holder?.player?.player = player
-            player.setMediaItem(MediaItem.fromUri(android.net.Uri.parse(urls.last())))
+            if (urls.size == 2) { val f = androidx.media3.exoplayer.source.DefaultMediaSourceFactory(this@ShortsActivity); player.setMediaSource(androidx.media3.exoplayer.source.MergingMediaSource(f.createMediaSource(MediaItem.fromUri(android.net.Uri.parse(urls[1]))), f.createMediaSource(MediaItem.fromUri(android.net.Uri.parse(urls[0]))))) } else player.setMediaItem(MediaItem.fromUri(android.net.Uri.parse(urls.last())))
             player.prepare()
             player.play()
         }
