@@ -136,4 +136,46 @@ class ShortsActivity : BaseActivity() {
         playJob?.cancel()
         if (::player.isInitialized) player.release()
     }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (android.os.Build.VERSION.SDK_INT >= 26 && ::player.isInitialized) {
+            enterPictureInPictureMode(buildPipParams())
+        }
+    }
+
+    private fun buildPipParams(): android.app.PictureInPictureParams {
+        val flags = android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        val prevIntent = android.app.PendingIntent.getBroadcast(this, 1, android.content.Intent(PIP_ACTION).setPackage(packageName).putExtra("dir", -1), flags)
+        val nextIntent = android.app.PendingIntent.getBroadcast(this, 2, android.content.Intent(PIP_ACTION).setPackage(packageName).putExtra("dir", 1), flags)
+        val prev = android.app.RemoteAction(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_pip_prev), "prev", "prev", prevIntent)
+        val next = android.app.RemoteAction(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_pip_next), "next", "next", nextIntent)
+        return android.app.PictureInPictureParams.Builder().setAspectRatio(android.util.Rational(9, 16)).setActions(listOf(prev, next)).build()
+    }
+
+    private val pipReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+            val dir = intent?.getIntExtra("dir", 0) ?: 0
+            val target = pager.currentItem + dir
+            if (target in 0 until adapter.itemCount) pager.currentItem = target
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: android.content.res.Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        val rv = pager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView
+        val holder = rv.findViewHolderForAdapterPosition(pager.currentItem) as? ShortsAdapter.ViewHolder
+        val vis = if (isInPictureInPictureMode) View.GONE else View.VISIBLE
+        holder?.let { listOf(it.like, it.share, it.download, it.author, it.title, it.progress).forEach { v -> v.visibility = vis } }
+        if (isInPictureInPictureMode) {
+            androidx.core.content.ContextCompat.registerReceiver(this, pipReceiver, android.content.IntentFilter(PIP_ACTION), androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED)
+        } else {
+            runCatching { unregisterReceiver(pipReceiver) }
+            if (lifecycle.currentState == androidx.lifecycle.Lifecycle.State.CREATED) finish()
+        }
+    }
+
+    companion object {
+        private const val PIP_ACTION = "com.deniscerri.ytdl.SHORTS_PIP"
+    }
 }
