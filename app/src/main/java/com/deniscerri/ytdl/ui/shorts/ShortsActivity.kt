@@ -34,6 +34,7 @@ class ShortsActivity : BaseActivity() {
     private lateinit var adapter: ShortsAdapter
     private var playJob: Job? = null
     private var currentPos = -1
+    private val urlCache = HashMap<String, List<String>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,22 @@ class ShortsActivity : BaseActivity() {
         }
     }
 
+    private suspend fun getUrls(u: String): List<String> {
+        urlCache[u]?.let { return it }
+        val r = withContext(Dispatchers.IO) { resultViewModel.getStreamingUrlAndChapters(u, 480).first }.filter { it.isNotBlank() }
+        if (r.isNotEmpty()) urlCache[u] = r
+        return r
+    }
+
+    private fun prefetch(from: Int) {
+        lifecycleScope.launch {
+            for (i in from + 1..from + 2) {
+                if (i >= adapter.itemCount) break
+                try { getUrls(adapter.currentList[i].url) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e }
+            }
+        }
+    }
+
     private fun playAt(position: Int) {
         if (position < 0 || position >= adapter.itemCount) return
         if (position == currentPos && player.isPlaying) return
@@ -97,7 +114,7 @@ class ShortsActivity : BaseActivity() {
         player.stop()
         player.clearMediaItems()
         playJob = lifecycleScope.launch {
-            val urls = withContext(Dispatchers.IO) { resultViewModel.getStreamingUrlAndChapters(item.url, 480).first }
+            val urls = getUrls(item.url)
             val url = urls.firstOrNull { it.isNotBlank() } ?: return@launch
             var holder: ShortsAdapter.ViewHolder? = null
             for (i in 0 until 10) { holder = (pager.getChildAt(0) as androidx.recyclerview.widget.RecyclerView).findViewHolderForAdapterPosition(position) as? ShortsAdapter.ViewHolder; if (holder != null) break; kotlinx.coroutines.delay(50) }
@@ -105,6 +122,7 @@ class ShortsActivity : BaseActivity() {
             if (urls.size == 2) { val f = androidx.media3.exoplayer.source.DefaultMediaSourceFactory(this@ShortsActivity); player.setMediaSource(androidx.media3.exoplayer.source.MergingMediaSource(f.createMediaSource(MediaItem.fromUri(android.net.Uri.parse(urls[1]))), f.createMediaSource(MediaItem.fromUri(android.net.Uri.parse(urls[0]))))) } else player.setMediaItem(MediaItem.fromUri(android.net.Uri.parse(urls.last())))
             player.prepare()
             player.play()
+            prefetch(position)
         }
     }
 
