@@ -744,4 +744,5 @@
         <item quantity="other">%d videos</item>
     </plurals>
     <string name="shorts">Shorts</string>
+    <string name="shorts_empty">No Shorts available</string>
 </resources>

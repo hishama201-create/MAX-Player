@@ -79,7 +79,7 @@ class ShortsActivity : BaseActivity() {
             }
             loading.visibility = View.GONE
             if (items.isEmpty()) {
-                Toast.makeText(this@ShortsActivity, R.string.shorts, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ShortsActivity, R.string.shorts_empty, Toast.LENGTH_SHORT).show()
                 return@launch
             }
             adapter.likedUrls = FavoritesStore.getAll(this@ShortsActivity).map { it.url }.toSet()
