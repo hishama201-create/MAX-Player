@@ -35,6 +35,7 @@ class ShortsActivity : BaseActivity() {
     private var playJob: Job? = null
     private var currentPos = -1
     private val urlCache = HashMap<String, List<String>>()
+    private var playT0 = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +50,11 @@ class ShortsActivity : BaseActivity() {
 
         player = VideoPlayerUtil.buildPlayer(this)
         player.repeatMode = ExoPlayer.REPEAT_MODE_ONE
+        player.addListener(object : androidx.media3.common.Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                android.util.Log.d("ShortsPerf", "state=$state since_play_ms=${System.currentTimeMillis() - playT0}")
+            }
+        })
 
         adapter = ShortsAdapter(
             onLike = { item -> toggleLike(item) },
@@ -92,7 +98,9 @@ class ShortsActivity : BaseActivity() {
 
     private suspend fun getUrls(u: String): List<String> {
         urlCache[u]?.let { return it }
+        val t0 = System.currentTimeMillis()
         val r = withContext(Dispatchers.IO) { resultViewModel.getStreamingUrlAndChapters(u, 480).first }.filter { it.isNotBlank() }
+        android.util.Log.d("ShortsPerf", "extract ms=${System.currentTimeMillis() - t0} n=${r.size} url=$u")
         if (r.isNotEmpty()) urlCache[u] = r
         return r
     }
@@ -112,6 +120,7 @@ class ShortsActivity : BaseActivity() {
         currentPos = position
         val item = adapter.currentList[position]
         playJob?.cancel()
+        playT0 = System.currentTimeMillis()
         player.stop()
         player.clearMediaItems()
         playJob = lifecycleScope.launch {
