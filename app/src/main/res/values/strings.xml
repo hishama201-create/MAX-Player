@@ -743,4 +743,19 @@
         <item quantity="one">%d video</item>
         <item quantity="other">%d videos</item>
     </plurals>
+    <string name="shorts">Shorts</string>
+    <string name="shorts_back">Back</string>
+    <string name="shorts_search_hint">Search Shorts or paste a YouTube link</string>
+    <string name="shorts_loading">Loading Shorts…</string>
+    <string name="shorts_empty">Search a topic, or paste a Shorts video or channel link</string>
+    <string name="shorts_no_results">No Shorts found for this search</string>
+    <string name="shorts_load_failed">Could not load this Shorts feed</string>
+    <string name="shorts_playback_failed">Could not play this video</string>
+    <string name="shorts_favorite">Save</string>
+    <string name="shorts_saved">Saved</string>
+    <string name="shorts_mute">Mute</string>
+    <string name="shorts_unmute">Unmute</string>
+    <string name="shorts_download">Download</string>
+    <string name="shorts_share">Share</string>
+    <string name="shorts_open">Open</string>
 </resources>

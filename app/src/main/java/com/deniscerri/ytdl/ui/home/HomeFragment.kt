@@ -58,6 +58,7 @@ import com.deniscerri.ytdl.database.viewmodel.ResultViewModel
 import com.deniscerri.ytdl.ui.adapter.HomeAdapter
 import com.deniscerri.ytdl.ui.adapter.SearchSuggestionsAdapter
 import com.deniscerri.ytdl.ui.more.cookies.WebViewActivity
+import com.deniscerri.ytdl.ui.shorts.ShortsActivity
 import com.deniscerri.ytdl.util.Extensions.enableFastScroll
 import com.deniscerri.ytdl.util.Extensions.isURL
 import com.deniscerri.ytdl.util.NotificationUtil
@@ -561,6 +562,9 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
 
         searchBar!!.setOnMenuItemClickListener { m: MenuItem ->
             when (m.itemId) {
+                R.id.open_shorts -> {
+                    startActivity(Intent(requireContext(), ShortsActivity::class.java))
+                }
                 R.id.copy_urls -> {
                     lifecycleScope.launch {
                         val urls = withContext(Dispatchers.IO){

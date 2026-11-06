@@ -734,4 +734,19 @@
         <item quantity="many">%d فيديو</item>
         <item quantity="other">%d فيديو</item>
     </plurals>
+    <string name="shorts">Shorts</string>
+    <string name="shorts_back">رجوع</string>
+    <string name="shorts_search_hint">ابحث عن Shorts أو ألصق رابط يوتيوب</string>
+    <string name="shorts_loading">جارٍ تحميل Shorts…</string>
+    <string name="shorts_empty">ابحث عن موضوع أو ألصق رابط مقطع أو قناة</string>
+    <string name="shorts_no_results">لم يتم العثور على مقاطع Shorts</string>
+    <string name="shorts_load_failed">تعذّر تحميل موجز Shorts</string>
+    <string name="shorts_playback_failed">تعذّر تشغيل هذا الفيديو</string>
+    <string name="shorts_favorite">حفظ</string>
+    <string name="shorts_saved">تم الحفظ</string>
+    <string name="shorts_mute">كتم</string>
+    <string name="shorts_unmute">تشغيل الصوت</string>
+    <string name="shorts_download">تنزيل</string>
+    <string name="shorts_share">مشاركة</string>
+    <string name="shorts_open">فتح</string>
 </resources>

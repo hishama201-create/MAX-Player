@@ -279,6 +279,23 @@ class NewPipeUtil(context: Context) {
     }
 
 
+    suspend fun getShortsData(url: String): Result<List<ResultItem>> {
+        try {
+            val channel = ChannelInfo.getInfo(ServiceList.YouTube, url)
+            val shortsTab = channel.tabs.firstOrNull { tab ->
+                tab.contentFilters.any { filter -> filter.equals("shorts", ignoreCase = true) }
+            } ?: return Result.failure(IllegalArgumentException("This channel does not expose a Shorts tab"))
+            val tabInfo = ChannelTabInfo.getInfo(ServiceList.YouTube, shortsTab)
+            val tabName = tabInfo.url.substringAfterLast('/').ifBlank { "shorts" }
+            val channelUrl = url.trimEnd('/').replace(Regex("/(shorts|videos|streams|playlists|live)$", RegexOption.IGNORE_CASE), "")
+            val shortsUrl = channelUrl + "/" + tabName
+            return getChannelTabData(shortsTab, tabInfo, channel.name, shortsUrl) { }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            return Result.failure(e)
+        }
+    }
+
     fun getTrending(): ArrayList<ResultItem> {
         try {
             val items = arrayListOf<ResultItem>()

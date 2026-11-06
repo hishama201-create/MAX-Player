@@ -26,5 +26,11 @@
         app:showAsAction="never" />
 
 
+    <item
+        android:id="@+id/open_shorts"
+        android:icon="@drawable/ic_video"
+        android:title="@string/shorts"
+        app:showAsAction="ifRoom" />
+
 </menu>
 
