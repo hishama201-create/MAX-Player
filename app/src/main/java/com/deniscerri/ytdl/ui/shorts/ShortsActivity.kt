@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.withPermit
 
 class ShortsActivity : BaseActivity() {
 
@@ -34,7 +35,7 @@ class ShortsActivity : BaseActivity() {
     private lateinit var adapter: ShortsAdapter
     private var playJob: Job? = null
     private var currentPos = -1
-    private val urlCache = HashMap<String, List<String>>()
+    private val urlCache = java.util.concurrent.ConcurrentHashMap<String, List<String>>()
     private var playT0 = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,11 +106,17 @@ class ShortsActivity : BaseActivity() {
         return r
     }
 
+    private val prefetchSem = kotlinx.coroutines.sync.Semaphore(2)
+
     private fun prefetch(from: Int) {
-        lifecycleScope.launch {
-            for (i in from + 1..from + 2) {
-                if (i >= adapter.itemCount) break
-                try { getUrls(adapter.currentList[i].url) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e }
+        for (i in from + 1..from + 5) {
+            if (i >= adapter.itemCount) break
+            val u = adapter.currentList[i].url
+            if (urlCache.containsKey(u)) continue
+            lifecycleScope.launch {
+                prefetchSem.withPermit {
+                    try { getUrls(u) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e }
+                }
             }
         }
     }
