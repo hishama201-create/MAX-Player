@@ -504,10 +504,6 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
         return repository.getStreamingUrlAndChapters(url, maxHeight)
     }
 
-    suspend fun getChannelShorts(channelUrl: String, count: Int = 20) : List<ResultItem> {
-        return repository.getChannelShorts(channelUrl, count)
-    }
-
     fun getItemIDsNotPresentIn(not: List<Long>) : List<Long> {
         val ids = repository.getFilteredIDs(playlistFilter.value)
         return ids.filter { !not.contains(it) }

@@ -337,28 +337,6 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
         return items
     }
 
-    suspend fun getChannelShorts(channelUrl: String, count: Int = 20) : ArrayList<ResultItem> {
-        val request = YTDLRequest(listOf())
-        request.setYoutubeExtractorArgs(null)
-        request.addOption("-j")
-        request.addOption("--flat-playlist")
-        request.addOption("--playlist-end", count.toString())
-        request.applyDefaultOptionsForFetchingData(channelUrl)
-        request.addOption(channelUrl)
-        val ytdlResponse = RuntimeManager.getInstance().runKillable { processId ->
-            RuntimeManager.getInstance().execute(request, processId)
-        }
-        val results: List<String?> = try {
-            val lineSeparator = System.getProperty("line.separator")
-            ytdlResponse.out.split(lineSeparator!!)
-        } catch (e: Exception) {
-            listOf(ytdlResponse.out)
-        }.filter { it.isNotBlank() }.apply {
-            if (this.isEmpty()) return arrayListOf()
-        }
-        return parseYTDLPListResults(results)
-    }
-
     suspend fun getYoutubeWatchLater() : ArrayList<ResultItem> {
         val request = YTDLRequest(listOf())
         request.setYoutubeExtractorArgs(null)

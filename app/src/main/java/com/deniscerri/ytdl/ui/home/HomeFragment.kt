@@ -179,7 +179,6 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         downloadSelectedFab = homeFabs!!.findViewById(R.id.download_selected_fab)
         downloadAllFab = homeFabs!!.findViewById(R.id.download_all_fab)
         clipboardFab = homeFabs!!.findViewById(R.id.copied_url_fab)
-        view.findViewById<View>(R.id.shorts_fab).setOnClickListener { startActivity(Intent(requireContext(), com.deniscerri.ytdl.ui.shorts.ShortsActivity::class.java)) }
         playlistNameFilterScrollView = view.findViewById(R.id.playlist_selection_chips_scrollview)
         playlistNameFilterChipGroup = view.findViewById(R.id.playlist_selection_chips)
 

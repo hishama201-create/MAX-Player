@@ -734,6 +734,4 @@
         <item quantity="many">%d فيديو</item>
         <item quantity="other">%d فيديو</item>
     </plurals>
-    <string name="shorts">Shorts</string>
-    <string name="shorts_empty">لا توجد Shorts متاحة</string>
 </resources>
