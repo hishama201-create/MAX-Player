@@ -71,7 +71,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
         addOption("--no-warnings")
         addOption("-R", "1")
         addOption("--compat-options", "manifest-filesize-approx")
-        val socketTimeout = sharedPreferences.getString("socket_timeout", "5")!!.ifEmpty { "5" }
+        val socketTimeout = sharedPreferences.getString("socket_timeout", "20")!!.ifEmpty { "20" }
         addOption("--socket-timeout", socketTimeout)
 
         if (sharedPreferences.getBoolean("force_ipv4", true)){
