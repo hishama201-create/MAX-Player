@@ -332,6 +332,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
                     if (res.errorMessage != null){
                         val isSingleQueryAndURL = queryList.size == 1 && Patterns.WEB_URL.matcher(queryList.first()).matches()
 
+                        if (isSingleQueryAndURL && res.errorMessage!!.contains("tiktok.com") && res.errorMessage!!.contains("/photo/")) { startActivity(Intent(requireContext(), com.deniscerri.ytdl.ui.tiktok.TikTokPhotosActivity::class.java).putExtra("url", queryList.first())) } else
                         runCatching {
                             UiUtil.handleNoResults(requireActivity(), res.errorMessage!!,
                                 url = if (isSingleQueryAndURL) queryList.first() else null,
