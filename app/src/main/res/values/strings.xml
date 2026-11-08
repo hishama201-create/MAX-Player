@@ -743,4 +743,9 @@
         <item quantity="one">%d video</item>
         <item quantity="other">%d videos</item>
     </plurals>
+    <string name="tt_deselect_all">Deselect all</string>
+    <string name="tt_select_all">Select all</string>
+    <string name="tt_slideshow">Download slideshow video</string>
+    <string name="tt_download_images">Download images (%1$d)</string>
+    <string name="tt_no_photos">No photos found in this post</string>
 </resources>

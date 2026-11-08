@@ -734,4 +734,9 @@
         <item quantity="many">%d فيديو</item>
         <item quantity="other">%d فيديو</item>
     </plurals>
+    <string name="tt_deselect_all">إلغاء تحديد الكل</string>
+    <string name="tt_select_all">تحديد الكل</string>
+    <string name="tt_slideshow">تحميل فيديو العرض التقديمي</string>
+    <string name="tt_download_images">تنزيل الصور (%1$d)</string>
+    <string name="tt_no_photos">لا توجد صور في هذا المنشور</string>
 </resources>

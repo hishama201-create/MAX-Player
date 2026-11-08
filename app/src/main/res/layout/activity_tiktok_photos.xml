@@ -1,0 +1,7 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp">
+    <TextView android:id="@+id/photos_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:maxLines="2" />
+    <Button android:id="@+id/photos_toggle" style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tt_deselect_all" />
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/photos_grid" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <Button android:id="@+id/photos_download" android:layout_width="match_parent" android:layout_height="wrap_content" />
+    <Button android:id="@+id/photos_slideshow" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/tt_slideshow" />
+</LinearLayout>
