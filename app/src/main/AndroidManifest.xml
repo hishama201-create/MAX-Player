@@ -628,6 +628,7 @@
 
         <activity android:name=".ui.watch.WatchActivity" android:supportsPictureInPicture="true" android:configChanges="smallestScreenSize|layoutDirection|orientation|screenSize|screenLayout" android:exported="false" />
         <activity android:name=".ui.library.LocalPlayerActivity" android:configChanges="smallestScreenSize|layoutDirection|orientation|screenSize|screenLayout"  android:supportsPictureInPicture="true" android:exported="false" />
+        <activity android:name=".ui.tiktok.TikTokPhotosActivity" android:exported="false" />
     </application>
 
 </manifest>

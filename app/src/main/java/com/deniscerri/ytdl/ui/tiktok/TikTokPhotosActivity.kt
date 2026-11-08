@@ -1,0 +1,103 @@
+package com.deniscerri.ytdl.ui.tiktok
+
+import android.os.Bundle
+import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.deniscerri.ytdl.R
+import com.deniscerri.ytdl.ui.BaseActivity
+import com.deniscerri.ytdl.util.FileUtil
+import com.deniscerri.ytdl.util.extractors.TikTokPhotoPost
+import com.deniscerri.ytdl.util.extractors.TikTokPhotoUtil
+import com.squareup.picasso.Picasso
+import java.io.File
+import java.net.URL
+
+class TikTokPhotosActivity : BaseActivity() {
+    private var post: TikTokPhotoPost? = null
+    private lateinit var selected: BooleanArray
+    private lateinit var grid: RecyclerView
+    private lateinit var downloadBtn: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_tiktok_photos)
+        grid = findViewById(R.id.photos_grid)
+        grid.layoutManager = GridLayoutManager(this, 3)
+        downloadBtn = findViewById(R.id.photos_download)
+        val url = intent.getStringExtra("url") ?: return finish()
+        lifecycleScope.launch {
+            val p = withContext(Dispatchers.IO) { runCatching { TikTokPhotoUtil.fetch(url) }.getOrNull() }
+            if (p == null || p.images.isEmpty()) { Toast.makeText(this@TikTokPhotosActivity, R.string.tt_no_photos, Toast.LENGTH_LONG).show(); finish(); return@launch }
+            show(p)
+        }
+        downloadBtn.setOnClickListener { downloadSelected() }
+    }
+
+    private fun show(p: TikTokPhotoPost) {
+        post = p
+        selected = BooleanArray(p.images.size) { true }
+        findViewById<TextView>(R.id.photos_title).text = "@" + p.author + " - " + p.title
+        grid.adapter = PhotosAdapter(p.images)
+        updateDownloadText()
+        val toggle = findViewById<Button>(R.id.photos_toggle)
+        toggle.setOnClickListener {
+            val all = selected.all { it }
+            selected.fill(!all)
+            toggle.setText(if (all) R.string.tt_select_all else R.string.tt_deselect_all)
+            grid.adapter?.notifyDataSetChanged(); updateDownloadText()
+        }
+    }
+
+    private fun updateDownloadText() {
+        val n = selected.count { it }
+        downloadBtn.text = getString(R.string.tt_download_images, n)
+        downloadBtn.isEnabled = n > 0
+    }
+
+    inner class PhotosAdapter(private val urls: List<String>) : RecyclerView.Adapter<PhotosAdapter.VH>() {
+        inner class VH(v: View) : RecyclerView.ViewHolder(v) {
+            val img: ImageView = v.findViewById(R.id.photo_img)
+            val check: CheckBox = v.findViewById(R.id.photo_check)
+        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(R.layout.item_tiktok_photo, parent, false))
+        override fun getItemCount() = urls.size
+        override fun onBindViewHolder(h: VH, i: Int) {
+            Picasso.get().load(urls[i]).into(h.img)
+            h.check.setOnCheckedChangeListener(null)
+            h.check.isChecked = selected[i]
+            h.check.setOnCheckedChangeListener { _, c -> selected[i] = c; updateDownloadText() }
+            h.img.setOnClickListener { h.check.isChecked = !h.check.isChecked }
+        }
+    }
+
+    private fun bytes(u: String): ByteArray {
+        val c = URL(u).openConnection()
+        c.connectTimeout = 30000; c.readTimeout = 30000
+        c.setRequestProperty("User-Agent", "Mozilla/5.0")
+        return c.getInputStream().use { it.readBytes() }
+    }
+
+    private fun downloadSelected() {
+        val p = post ?: return
+        val dir = File(FileUtil.getDefaultApplicationPath(), "Photos"); dir.mkdirs()
+        downloadBtn.isEnabled = false
+        lifecycleScope.launch {
+            var ok = 0
+            withContext(Dispatchers.IO) { p.images.forEachIndexed { i, u -> if (selected[i]) runCatching { File(dir, p.author + "_" + System.currentTimeMillis() + "_" + (i + 1) + ".jpg").writeBytes(bytes(u)); ok++ } } }
+            Toast.makeText(this@TikTokPhotosActivity, "$ok -> " + dir.absolutePath, Toast.LENGTH_LONG).show()
+            updateDownloadText()
+        }
+    }
+}
