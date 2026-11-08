@@ -1011,7 +1011,7 @@ class YTDLPUtil(private val context: Context, private val commandTemplateDao: Co
             }
         }
 
-        val aria2 = sharedPreferences.getBoolean("aria2", true)
+        val aria2 = sharedPreferences.getBoolean("aria2", false)
         if (aria2) {
             ytDlRequest.addOption("--downloader", "libaria2c.so")
             //request.addOption("--external-downloader-args", "aria2c:\"--summary-interval=1\"")

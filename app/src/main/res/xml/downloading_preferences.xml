@@ -143,7 +143,7 @@
 
         <SwitchPreferenceCompat
             android:widgetLayout="@layout/preferece_material_switch"
-            app:defaultValue="true"
+            app:defaultValue="false"
             android:icon="@drawable/ic_speed"
             android:key="aria2"
             app:summary="@string/aria2_summary"
