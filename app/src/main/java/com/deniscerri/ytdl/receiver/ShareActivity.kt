@@ -181,6 +181,13 @@ class ShareActivity : BaseActivity() {
             val background = intent.getBooleanExtra("BACKGROUND", ai.metaData?.getBoolean("quick_run_background", false) == true)
 
             lifecycleScope.launch {
+                if (inputQuery.contains("tiktok.com")) {
+                    val tt = withContext(Dispatchers.IO) { runCatching { com.deniscerri.ytdl.util.extractors.TikTokPhotoUtil.fetch(inputQuery) }.getOrNull() }
+                    if (tt != null && tt.images.isNotEmpty()) {
+                        startActivity(Intent(this@ShareActivity, com.deniscerri.ytdl.ui.tiktok.TikTokPhotosActivity::class.java).putExtra("url", inputQuery))
+                        finish(); return@launch
+                    }
+                }
                 val result: ResultItem
                 val existingResults = withContext(Dispatchers.IO){
                     resultViewModel.getAllByURL(inputQuery)
