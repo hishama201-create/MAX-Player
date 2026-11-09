@@ -43,6 +43,7 @@ class TikTokPhotosActivity : BaseActivity() {
             show(p)
         }
         downloadBtn.setOnClickListener { downloadSelected() }
+        findViewById<Button>(R.id.photos_slideshow).setOnClickListener { makeSlideshow() }
     }
 
     private fun show(p: TikTokPhotoPost) {
@@ -98,6 +99,37 @@ class TikTokPhotosActivity : BaseActivity() {
             withContext(Dispatchers.IO) { p.images.forEachIndexed { i, u -> if (selected[i]) runCatching { File(dir, p.author + "_" + System.currentTimeMillis() + "_" + (i + 1) + ".jpg").writeBytes(bytes(u)); ok++ } } }
             Toast.makeText(this@TikTokPhotosActivity, "$ok -> " + dir.absolutePath, Toast.LENGTH_LONG).show()
             updateDownloadText()
+        }
+    }
+
+    private fun makeSlideshow() {
+        val p = post ?: return
+        val sel = p.images.filterIndexed { i, _ -> selected[i] }
+        if (sel.isEmpty()) return
+        val btn = findViewById<Button>(R.id.photos_slideshow); btn.isEnabled = false
+        val work = File(cacheDir, "tt_slide"); work.deleteRecursively(); work.mkdirs()
+        lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) { runCatching {
+                sel.forEachIndexed { i, u -> File(work, (i + 1).toString() + ".jpg").writeBytes(bytes(u)) }
+                val fresh = TikTokPhotoUtil.fetch(intent.getStringExtra("url")!!)
+                val audio = File(work, "a.mp3"); if (fresh != null && fresh.audioUrl.isNotEmpty()) audio.writeBytes(bytes(fresh.audioUrl))
+                val rm = com.deniscerri.ytdl.core.RuntimeManager.getInstance(); rm.assertInit()
+                val ff = rm.ffmpegLocation; if (!ff.isAvailable) error("no ffmpeg")
+                val outDir = File(FileUtil.getDefaultApplicationPath(), "Photos"); outDir.mkdirs()
+                val out = File(outDir, p.author + "_" + System.currentTimeMillis() + ".mp4")
+                val hasAudio = File(work, "a.mp3").let { it.exists() && it.length() > 0 }
+                val cmd = mutableListOf(ff.executable.absolutePath, "-y", "-framerate", "1/3", "-i", File(work, "%d.jpg").absolutePath)
+                if (hasAudio) { cmd.add("-i"); cmd.add(File(work, "a.mp3").absolutePath) }
+                cmd.addAll(listOf("-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:-1:-1,format=yuv420p", "-r", "30", "-c:v", "libx264"))
+                if (hasAudio) cmd.addAll(listOf("-c:a", "aac", "-shortest"))
+                cmd.add(out.absolutePath)
+                val pb = ProcessBuilder(cmd).redirectErrorStream(true)
+                rm.getEnvironmentForTerminal().forEach { (k, v) -> pb.environment()[k] = v }
+                val proc = pb.start(); proc.inputStream.bufferedReader().readText()
+                proc.waitFor() == 0 && out.exists() && out.length() > 0
+            }.getOrDefault(false) }
+            work.deleteRecursively(); btn.isEnabled = true
+            Toast.makeText(this@TikTokPhotosActivity, if (ok) R.string.tt_video_saved else R.string.tt_video_failed, Toast.LENGTH_LONG).show()
         }
     }
 }

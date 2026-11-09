@@ -748,4 +748,6 @@
     <string name="tt_slideshow">Download slideshow video</string>
     <string name="tt_download_images">Download images (%1$d)</string>
     <string name="tt_no_photos">No photos found in this post</string>
+    <string name="tt_video_saved">Slideshow video saved</string>
+    <string name="tt_video_failed">Could not create the slideshow video</string>
 </resources>
