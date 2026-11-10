@@ -112,7 +112,7 @@ class TikTokPhotosActivity : BaseActivity() {
             val ok = withContext(Dispatchers.IO) { runCatching {
                 sel.forEachIndexed { i, u -> File(work, (i + 1).toString() + ".jpg").writeBytes(bytes(u)) }
                 val fresh = TikTokPhotoUtil.fetch(intent.getStringExtra("url")!!)
-                val audio = File(work, "a.mp3"); if (fresh != null && fresh.audioUrl.isNotEmpty()) audio.writeBytes(bytes(fresh.audioUrl))
+                val audio = File(work, "a.mp3"); if (fresh != null && fresh.audioUrl.isNotEmpty()) runCatching { audio.writeBytes(bytes(fresh.audioUrl)) }
                 val rm = com.deniscerri.ytdl.core.RuntimeManager.getInstance(); rm.assertInit()
                 val ff = rm.ffmpegLocation; if (!ff.isAvailable) error("no ffmpeg")
                 val outDir = File(FileUtil.getDefaultApplicationPath(), "Photos"); outDir.mkdirs()
