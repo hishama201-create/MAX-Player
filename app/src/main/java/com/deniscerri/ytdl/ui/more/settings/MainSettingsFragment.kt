@@ -160,6 +160,8 @@ class MainSettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
+        findPreference<Preference>("version")?.summary = BuildConfig.VERSION_NAME
+
         findPreference<Preference>("translators")?.setOnPreferenceClickListener {
             TranslatorsDialog.show(requireContext())
             true

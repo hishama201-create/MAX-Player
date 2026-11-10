@@ -65,6 +65,10 @@
             app:key="package_name"
             app:title="@string/package_name" />
         <Preference
+            app:icon="@drawable/ic_code"
+            app:key="version"
+            app:title="@string/app_version" />
+        <Preference
             app:icon="@drawable/ic_translate"
             app:key="translators"
             app:summary="@string/translators_summary"

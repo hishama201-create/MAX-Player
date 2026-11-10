@@ -741,4 +741,5 @@
     <string name="tt_no_photos">لا توجد صور في هذا المنشور</string>
     <string name="tt_video_saved">تم حفظ فيديو العرض التقديمي</string>
     <string name="tt_video_failed">تعذّر إنشاء فيديو العرض التقديمي</string>
+    <string name="app_version">الإصدار</string>
 </resources>
