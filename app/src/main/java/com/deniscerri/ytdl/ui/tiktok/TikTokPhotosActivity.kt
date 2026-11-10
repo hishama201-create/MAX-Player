@@ -125,9 +125,9 @@ class TikTokPhotosActivity : BaseActivity() {
                 cmd.add(out.absolutePath)
                 val pb = ProcessBuilder(cmd).redirectErrorStream(true)
                 rm.getEnvironmentForTerminal().forEach { (k, v) -> pb.environment()[k] = v }
-                val proc = pb.start(); proc.inputStream.bufferedReader().readText()
+                val proc = pb.start(); File(FileUtil.getDefaultApplicationPath(), "e.txt").writeText(proc.inputStream.bufferedReader().readText())
                 proc.waitFor() == 0 && out.exists() && out.length() > 0
-            }.getOrDefault(false) }
+            }.onFailure { File(FileUtil.getDefaultApplicationPath(), "e.txt").writeText("$it") }.getOrDefault(false) }
             work.deleteRecursively(); btn.isEnabled = true
             Toast.makeText(this@TikTokPhotosActivity, if (ok) R.string.tt_video_saved else R.string.tt_video_failed, Toast.LENGTH_LONG).show()
         }
