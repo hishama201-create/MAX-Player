@@ -97,6 +97,7 @@ class TikTokPhotosActivity : BaseActivity() {
         lifecycleScope.launch {
             var ok = 0
             withContext(Dispatchers.IO) { p.images.forEachIndexed { i, u -> if (selected[i]) runCatching { File(dir, p.author + "_" + System.currentTimeMillis() + "_" + (i + 1) + ".jpg").writeBytes(bytes(u)); ok++ } } }
+            android.media.MediaScannerConnection.scanFile(this@TikTokPhotosActivity, dir.listFiles()?.map { it.absolutePath }?.toTypedArray() ?: arrayOf(), null, null)
             Toast.makeText(this@TikTokPhotosActivity, "$ok -> " + dir.absolutePath, Toast.LENGTH_LONG).show()
             updateDownloadText()
         }
@@ -129,6 +130,7 @@ class TikTokPhotosActivity : BaseActivity() {
                 proc.waitFor() == 0 && out.exists() && out.length() > 0
             }.onFailure { File(FileUtil.getDefaultApplicationPath(), "e.txt").writeText("$it") }.getOrDefault(false) }
             work.deleteRecursively(); btn.isEnabled = true
+            android.media.MediaScannerConnection.scanFile(this@TikTokPhotosActivity, File(FileUtil.getDefaultApplicationPath(), "Photos").listFiles()?.map { it.absolutePath }?.toTypedArray() ?: arrayOf(), null, null)
             Toast.makeText(this@TikTokPhotosActivity, if (ok) R.string.tt_video_saved else R.string.tt_video_failed, Toast.LENGTH_LONG).show()
         }
     }
