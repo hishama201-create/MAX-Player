@@ -751,4 +751,6 @@
     <string name="tt_video_saved">Slideshow video saved</string>
     <string name="tt_video_failed">Could not create the slideshow video</string>
     <string name="app_version">Version</string>
+    <string name="tt_downloading">Downloading in background…</string>
+    <string name="tt_images_saved">Images saved</string>
 </resources>

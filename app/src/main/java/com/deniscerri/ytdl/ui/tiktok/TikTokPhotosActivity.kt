@@ -42,8 +42,8 @@ class TikTokPhotosActivity : BaseActivity() {
             if (p == null || p.images.isEmpty()) { Toast.makeText(this@TikTokPhotosActivity, R.string.tt_no_photos, Toast.LENGTH_LONG).show(); finish(); return@launch }
             show(p)
         }
-        downloadBtn.setOnClickListener { downloadSelected() }
-        findViewById<Button>(R.id.photos_slideshow).setOnClickListener { makeSlideshow() }
+        downloadBtn.setOnClickListener { startBg(false) }
+        findViewById<Button>(R.id.photos_slideshow).setOnClickListener { startBg(true) }
     }
 
     private fun show(p: TikTokPhotoPost) {
@@ -88,6 +88,15 @@ class TikTokPhotosActivity : BaseActivity() {
         c.connectTimeout = 30000; c.readTimeout = 30000
         c.setRequestProperty("User-Agent", "Mozilla/5.0")
         return c.getInputStream().use { it.readBytes() }
+    }
+
+    private fun startBg(video: Boolean) {
+        if (post == null) return
+        val i = android.content.Intent(this, com.deniscerri.ytdl.services.TikTokDownloadService::class.java)
+        i.putExtra("url", intent.getStringExtra("url")).putExtra("sel", selected).putExtra("video", video)
+        androidx.core.content.ContextCompat.startForegroundService(this, i)
+        startActivity(android.content.Intent(this, com.deniscerri.ytdl.MainActivity::class.java).setAction(android.content.Intent.ACTION_VIEW).putExtra("destination", "Queue"))
+        finish()
     }
 
     private fun downloadSelected() {
