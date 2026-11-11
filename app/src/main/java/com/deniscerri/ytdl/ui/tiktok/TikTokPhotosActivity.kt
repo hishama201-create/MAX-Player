@@ -74,8 +74,14 @@ class TikTokPhotosActivity : BaseActivity() {
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(R.layout.item_tiktok_photo, parent, false))
         override fun getItemCount() = urls.size
+        private fun loadImg(h: VH, i: Int, n: Int) {
+            Picasso.get().load(urls[i]).into(h.img, object : com.squareup.picasso.Callback {
+                override fun onSuccess() {}
+                override fun onError(e: Exception?) { if (n < 3 && h.img.tag == i) h.img.postDelayed({ if (h.img.tag == i) loadImg(h, i, n + 1) }, 1500) }
+            })
+        }
         override fun onBindViewHolder(h: VH, i: Int) {
-            Picasso.get().load(urls[i]).into(h.img)
+            h.img.tag = i; loadImg(h, i, 0)
             h.check.setOnCheckedChangeListener(null)
             h.check.isChecked = selected[i]
             h.check.setOnCheckedChangeListener { _, c -> selected[i] = c; updateDownloadText() }
