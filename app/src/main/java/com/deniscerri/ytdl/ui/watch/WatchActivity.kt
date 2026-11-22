@@ -103,6 +103,7 @@ class WatchActivity : BaseActivity() {
 
         player = VideoPlayerUtil.buildPlayer(this)
         player.setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
+        player.setAudioAttributes(androidx.media3.common.AudioAttributes.Builder().setUsage(androidx.media3.common.C.USAGE_MEDIA).setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE).build(), true)
         com.deniscerri.ytdl.services.WatchPlaybackService.player = player
         androidx.core.content.ContextCompat.startForegroundService(this, android.content.Intent(this, com.deniscerri.ytdl.services.WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.watch_player).player = player
@@ -394,6 +395,7 @@ class WatchActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (::player.isInitialized && isFinishing && player.isPlaying && com.deniscerri.ytdl.services.WatchPlaybackService.player === player) { com.deniscerri.ytdl.services.WatchPlaybackService.detached = true; if (current?.get() === this) current = null; return }
         if (::player.isInitialized && com.deniscerri.ytdl.services.WatchPlaybackService.player === player) {
             com.deniscerri.ytdl.services.WatchPlaybackService.player = null
             stopService(android.content.Intent(this, com.deniscerri.ytdl.services.WatchPlaybackService::class.java))
