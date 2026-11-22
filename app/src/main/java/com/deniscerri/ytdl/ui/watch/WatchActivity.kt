@@ -107,6 +107,7 @@ class WatchActivity : BaseActivity() {
         com.deniscerri.ytdl.services.WatchPlaybackService.player = player
         androidx.core.content.ContextCompat.startForegroundService(this, android.content.Intent(this, com.deniscerri.ytdl.services.WatchPlaybackService::class.java))
         findViewById<PlayerView>(R.id.watch_player).player = player
+        player.addListener(object : androidx.media3.common.Player.Listener { override fun onPlaybackStateChanged(state: Int) { if (state == androidx.media3.common.Player.STATE_ENDED && !isDestroyed) suggestionsAdapter.currentList.firstOrNull()?.let { playItem(it) } } })
 
         suggestionsAdapter = WatchSuggestionsAdapter { playItem(it) }
         findViewById<RecyclerView>(R.id.watch_suggestions).apply {
