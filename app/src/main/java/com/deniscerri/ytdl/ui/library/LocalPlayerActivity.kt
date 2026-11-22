@@ -57,6 +57,7 @@ class LocalPlayerActivity : AppCompatActivity() {
         if (WatchPlaybackService.detached) { val old = WatchPlaybackService.player; WatchPlaybackService.detached = false; WatchPlaybackService.player = null; stopService(Intent(this, WatchPlaybackService::class.java)); old?.release() }
         player = VideoPlayerUtil.buildPlayer(this)
         player.setWakeMode(androidx.media3.common.C.WAKE_MODE_LOCAL)
+        player.setAudioAttributes(androidx.media3.common.AudioAttributes.Builder().setUsage(androidx.media3.common.C.USAGE_MEDIA).setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE).build(), true)
         player.setMediaItems(items, start.coerceIn(0, items.size - 1), 0L)
         restorePosition(start.coerceIn(0, items.size - 1))
         player.prepare()
